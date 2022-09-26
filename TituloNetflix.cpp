@@ -21,5 +21,18 @@ char *Lista::to_string() const
 
 void TituloNetflix::Print()
 {
-
+    cout
+        << "TituloNetflix:" << endl
+        << "\tId: " << id << endl <<
+        << "\tTipo: " << tipo << endl <<
+        << "\tTitulo: " << titulo << endl <<
+        << "\tDiretor(es): " << diretor.to_string() << endl <<
+        << "\tElenco: " << elenco.to_string() << endl <<
+        << "\tPais(es): " << pais.to_string() << endl <<
+        << "\tData: " << data << endl <<
+        << "\tAno Lancamento: " << ano_lancamento << endl <<
+        << "\tAvaliacao: " << avaliacao << endl <<
+        << "\tDuracao: " << duracao << endl <<
+        << "\tListado em: " << listado_em.to_string() << endl <<
+        << "\tDescricao: " << descricao << endl;
 }
