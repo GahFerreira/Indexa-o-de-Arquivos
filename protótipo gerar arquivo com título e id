@@ -1,0 +1,15 @@
+
+void salvar(TituloNetflix* nomes){
+	
+	fstream arquivo2;
+	arquivo2.open("índices.txt",ios::out);
+	
+	for(int contador = 0;contador<sizeof(nomes);contador++){
+		
+		arquivo2<<nomes[contador].titulo;
+		arquivo2<<";";
+		arquivo2<<nomes[contador].id;
+		arquivo2<<"\n";
+	}
+	
+}
