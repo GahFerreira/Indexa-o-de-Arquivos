@@ -38,7 +38,10 @@ class TituloNetflix
         Lista listado_em;
         char descricao[TAM_DESCRICAO + 1];
 
-        void Print() const;
+        TituloNetflix();
+
+        void print() const;
+        void obter_registro();
 };
 
 #endif // TITULO_NETFLIX_H_

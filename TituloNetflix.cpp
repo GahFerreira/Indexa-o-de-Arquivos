@@ -2,6 +2,11 @@
 #include <iostream>
 #include <cstring>
 
+TituloNetflix::TituloNetflix()
+{
+
+}
+
 char *Lista::to_string() const
 {
     string str_resultado;
@@ -20,7 +25,7 @@ char *Lista::to_string() const
     return resultado;
 }
 
-void TituloNetflix::Print() const
+void TituloNetflix::print() const
 {
     cout
         << "TituloNetflix:" << endl
@@ -37,3 +42,8 @@ void TituloNetflix::Print() const
         << "\tListado em: " << listado_em.to_string() << endl
         << "\tDescricao: " << descricao << endl;
 }
+
+//void TituloNetflix::obter_registro(const char *registro, int tamanho, char delimitador)
+//{
+//
+//}
