@@ -1,4 +1,5 @@
 #include "TituloNetflix.h"
+#include <iostream>
 #include <cstring>
 
 char *Lista::to_string() const
@@ -19,20 +20,20 @@ char *Lista::to_string() const
     return resultado;
 }
 
-void TituloNetflix::Print()
+void TituloNetflix::Print() const
 {
     cout
         << "TituloNetflix:" << endl
-        << "\tId: " << id << endl <<
-        << "\tTipo: " << tipo << endl <<
-        << "\tTitulo: " << titulo << endl <<
-        << "\tDiretor(es): " << diretor.to_string() << endl <<
-        << "\tElenco: " << elenco.to_string() << endl <<
-        << "\tPais(es): " << pais.to_string() << endl <<
-        << "\tData: " << data << endl <<
-        << "\tAno Lancamento: " << ano_lancamento << endl <<
-        << "\tAvaliacao: " << avaliacao << endl <<
-        << "\tDuracao: " << duracao << endl <<
-        << "\tListado em: " << listado_em.to_string() << endl <<
+        << "\tId: " << id << endl
+        << "\tTipo: " << tipo << endl
+        << "\tTitulo: " << titulo << endl
+        << "\tDiretor(es): " << diretor.to_string() << endl
+        << "\tElenco: " << elenco.to_string() << endl
+        << "\tPais(es): " << pais.to_string() << endl
+        << "\tData: " << data << endl
+        << "\tAno Lancamento: " << ano_lancamento << endl
+        << "\tAvaliacao: " << avaliacao << endl
+        << "\tDuracao: " << duracao << endl
+        << "\tListado em: " << listado_em.to_string() << endl
         << "\tDescricao: " << descricao << endl;
 }
