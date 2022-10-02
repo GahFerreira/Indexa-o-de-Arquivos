@@ -16,6 +16,19 @@ class Manipulador
         Manipulador();
 
         bool criar_arquivo_inicial(const char *nome_arq_entrada);
+    
+    
+    
+        //criar essas funções depois
+    /*
+        
+        bool criar_arquivo_indice(const char *nome_arq_entrada,TituloNetflix* TN );
+        bool criar_arquivo_titulo(const char *nome_arq_entrada,TituloNetflix* TN );
+        //RETORNA O O QUE SERÁ PASSADO COMO TN
+        TituloNetflix* gerar_array_de_titulos(const char *nome_arq_entrada);
+        
+    */
+    
 };
 
 #endif // MANIPULADOR_H
