@@ -93,16 +93,29 @@ TituloNetflix* Manipulador::gerar_array_de_titulos(const char *nome_arq_entrada)
 					
 				while(c != ';'){
                 
-                //primeiro campo...
+               	 			//primeiro campo...
 					
+					string auxiliar="";
+					
+					c=arq_entrada.get();
+					
+					if(c != ';'){
+						auxiliar+= c;
+					}
 					
 					
 					
 				}
+				
+				titulos[contador_registro].id = auxiliar;	
+					
+					
+					
+				
 				
 				while(c != ';'){
                 
-                //segundo campo...
+                		//segundo campo...
 					
 					
 					
@@ -111,7 +124,7 @@ TituloNetflix* Manipulador::gerar_array_de_titulos(const char *nome_arq_entrada)
 				
 				while(c != ';'){
 					
-					
+				//terceiro campo...	
 					
 					
 				}
