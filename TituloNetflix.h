@@ -37,6 +37,8 @@ class TituloNetflix
         char duracao[TAM_DURACAO+1];
         Lista listado_em;
         char descricao[TAM_DESCRICAO + 1];
+        //pode precisar
+        //int tamanho_registro;
 
         TituloNetflix();
 
