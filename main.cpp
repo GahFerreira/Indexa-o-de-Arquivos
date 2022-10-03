@@ -1,5 +1,7 @@
 #include <iostream>
+
 #include "Manipulador.h"
+#include "TituloNetflix.h"
 
 using namespace std;
 
@@ -15,7 +17,7 @@ int main()
         << "Arquivo de entrada: netflix_titles.csv\n"
         << "Lendo arquivo de entrada e gerando arquivo inicial\n";
 
-    if (manipulador.criar_arquivo_inicial("netflix_titles.csv"))
+    if (manipulador.criar_arquivo_inicial("netflix_titles.csv", "arquivo_inicial.txt"))
     {
         cout << "Leitura do arquivo de entrada e criacao do novo arquivo bem sucedidos\n";
     }

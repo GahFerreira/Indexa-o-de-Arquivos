@@ -1,6 +1,7 @@
 #ifndef MANIPULADOR_H_
 #define MANIPULADOR_H_
 
+#include <iostream>
 #include <fstream>
 #include "TituloNetflix.h"
 
@@ -13,11 +14,10 @@ class Manipulador
         string dados;
         int prox = 0;
 
-        Manipulador();
+        int ler_inteiro(ifstream& arquivo);
+        string ler_registro(ifstream& arquivo);
 
-        bool criar_arquivo_inicial(const char *nome_arq_entrada);
-    
-    
+        bool criar_arquivo_inicial(const char *nome_arq_entrada, const char *nome_arq_inicial);
     
         //criar essas funções depois
     /*

@@ -1,7 +1,10 @@
 #ifndef TITULO_NETFLIX_H_
 #define TITULO_NETFLIX_H_
 
+#include <iostream>
+#include <fstream>
 #include <string>
+#include <cstring>
 
 using namespace std;
 
@@ -36,7 +39,7 @@ class TituloNetflix
         char avaliacao[TAM_AVALIACAO+1];
         char duracao[TAM_DURACAO+1];
         Lista listado_em;
-        char descricao[TAM_DESCRICAO + 1];
+        char descricao[TAM_DESCRICAO+1];
         //pode precisar
         //int tamanho_registro;
 
@@ -44,6 +47,8 @@ class TituloNetflix
 
         void print() const;
         void obter_registro();
+
+        bool criar_arquivo_indice_primario(const char *nome_arq_inicial, const char *nome_arq_indice_primario);
 };
 
 #endif // TITULO_NETFLIX_H_

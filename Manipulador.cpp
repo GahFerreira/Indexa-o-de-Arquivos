@@ -1,47 +1,76 @@
 #include "Manipulador.h"
-#include <iostream>
 
-Manipulador::Manipulador()
+/**
+ * Função com objetivo de, a partir de um arquivo de entrada, que contém 1 registro por linha,
+ * lê todos os registros do arquivo e gera um novo arquivo, denominado arquivo_inicial, que
+ * contém os mesmos registros com o seu tamanho escrito antes.
+ * 
+ * nome_arq_entrada: nome do arquivo de entrada  
+ * nome_arq_inicial: nome do arquivo inicial (com registros e seu respectivo tamanho antes)
+*/
+bool Manipulador::criar_arquivo_inicial(const char *nome_arq_entrada, const char *nome_arq_inicial)
 {
-}
+	ifstream arquivo_entrada;
+    ofstream arquivo_inicial;
+	string registro;
+	int tamanho_registro, quantidade_registros;
 
-bool Manipulador::criar_arquivo_inicial(const char *nome_arq_entrada)
-{
-    fstream arq_entrada, arq_dados;
+	arquivo_entrada.open(nome_arq_entrada, ios_base::in);
+	arquivo_inicial.open(nome_arq_inicial, ios_base::out);
 
-    arq_entrada.open(nome_arq_entrada, ios_base::in);
-    arq_dados.open("dados.txt", ios_base::out);
+	// Checa a abertura dos arquivos
+	if (arquivo_entrada.fail() == true or arquivo_inicial.fail() == true)
+	{
+		if (arquivo_entrada.fail() == true)
+		{
+			cout << "Erro na abertura de arquivo " + string(nome_arq_entrada) << endl;
+		}
 
-    cout << "Abertura dos arquivos bem sucedida\n";
+		else arquivo_entrada.close();
 
-    TituloNetflix tn;
-    string registro_como_string;
-    int tam_registro;
+		if (arquivo_inicial.fail() == true)
+		{
+			cout << "Erro na abertura de arquivo " + string(nome_arq_inicial) << endl;
+		}
 
-    cout << "Inicio do processamento\n";
+		else arquivo_inicial.close();
 
-    while (true)
-    {
-        getline(arq_entrada, registro_como_string);
+		return false;
+	}
 
-        cout << registro_como_string << '\n';
+	// Guarda os primeiros bytes do arquivo para salvar a quantidade de registros
+	arquivo_inicial.seekp(sizeof(quantidade_registros), ios_base::beg);
 
-        if ((int) registro_como_string.size() <= 0) break;
+	// Lê registros até não achar mais registros no arquivo (EOF)
+	while (arquivo_entrada.eof() == false)
+	{
+		std::getline(arquivo_entrada, registro);
 
-        tam_registro = (int) registro_como_string.size();
+		if (registro.size() <= 0) break;
 
-        arq_dados.write((char *)(&tam_registro), sizeof(tam_registro));
-        arq_dados.write((char *) registro_como_string.c_str(), sizeof((int) registro_como_string.size()));
-    }
+		quantidade_registros++;
 
-    cout << "Processamento bem sucedido\n";
+		tamanho_registro = (int) registro.size();
 
-    arq_entrada.close();
-    arq_dados.close();
+		arquivo_inicial.write((const char *) &tamanho_registro, sizeof(tamanho_registro));
 
-    cout << "Fechamento dos arquivos bem sucedido\n";
+		arquivo_inicial.write((const char *) registro.c_str(), tamanho_registro);
+	}
 
-    return true;
+	// Volta para o início do arquivo
+	arquivo_inicial.seekp(0, ios_base::beg);
+
+	// Escreve a quantidade de registros no início (cabeçalho) do arquivo
+	arquivo_inicial.write((const char *) &quantidade_registros, sizeof(quantidade_registros));
+
+	arquivo_entrada.close();
+	arquivo_inicial.close();
+
+	// Checa se houve algum erro ocorreu, diferente de EOF / FAIL
+	// EOF / FAIL acontecem ao tentar ler no final do arquivo
+	if (arquivo_entrada.bad() or arquivo_inicial.bad()) return false;
+
+	return true;
 }
 
 

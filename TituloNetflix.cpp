@@ -1,11 +1,4 @@
 #include "TituloNetflix.h"
-#include <iostream>
-#include <cstring>
-
-TituloNetflix::TituloNetflix()
-{
-
-}
 
 char *Lista::to_string() const
 {
@@ -47,3 +40,14 @@ void TituloNetflix::print() const
 //{
 //
 //}
+
+bool TituloNetflix::criar_arquivo_indice_primario(const char *nome_arq_inicial, const char *nome_arq_indice_primario)
+{
+    ifstream arquivo_inicial;
+    ofstream arquivo_indice_primario;
+
+    arquivo_inicial.open(nome_arq_inicial, ios_base::in);    
+    arquivo_indice_primario.open(nome_arq_indice_primario, ios_base::out);
+
+    
+}
