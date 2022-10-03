@@ -105,9 +105,6 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
     }
 }
 
-
-
-
 bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const char *nome_arq_titulo){
 
 
