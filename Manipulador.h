@@ -10,14 +10,11 @@ using namespace std;
 class Manipulador
 {
     public:
-        char delimitador = '\0';
-        string dados;
-        int prox = 0;
-
         int ler_inteiro(ifstream& arquivo);
         string ler_registro(ifstream& arquivo);
 
-        bool criar_arquivo_inicial(const char *nome_arq_entrada, const char *nome_arq_inicial);
+        bool escrever_dados(ofstream& arquivo, string dados);
+        bool escrever_dados(ofstream& arquivo, string dados, int tamanho);
     
         //criar essas funções depois
     /*
@@ -31,4 +28,4 @@ class Manipulador
     
 };
 
-#endif // MANIPULADOR_H
+#endif // MANIPULADOR_H_

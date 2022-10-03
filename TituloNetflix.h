@@ -43,7 +43,8 @@ class TituloNetflix
         //pode precisar
         //int tamanho_registro;
 
-        TituloNetflix();
+        
+        TituloNetflix(string registro);
 
         void print() const;
         void obter_registro();

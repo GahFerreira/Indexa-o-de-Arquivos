@@ -1,80 +1,76 @@
 #include "Manipulador.h"
 
-/**
- * Função com objetivo de, a partir de um arquivo de entrada, que contém 1 registro por linha,
- * lê todos os registros do arquivo e gera um novo arquivo, denominado arquivo_inicial, que
- * contém os mesmos registros com o seu tamanho escrito antes.
- * 
- * nome_arq_entrada: nome do arquivo de entrada  
- * nome_arq_inicial: nome do arquivo inicial (com registros e seu respectivo tamanho antes)
-*/
-bool Manipulador::criar_arquivo_inicial(const char *nome_arq_entrada, const char *nome_arq_inicial)
+int ler_inteiro(ifstream& arquivo)
 {
-	ifstream arquivo_entrada;
-    ofstream arquivo_inicial;
-	string registro;
-	int tamanho_registro, quantidade_registros;
+	int inteiro;
 
-	arquivo_entrada.open(nome_arq_entrada, ios_base::in);
-	arquivo_inicial.open(nome_arq_inicial, ios_base::out);
+	arquivo.read((char *) &inteiro, sizeof(inteiro));
 
-	// Checa a abertura dos arquivos
-	if (arquivo_entrada.fail() == true or arquivo_inicial.fail() == true)
+	return inteiro;	
+}
+
+
+string ler_registro(ifstream& arquivo)
+{
+	int tamanho;
+
+	tamanho = ler_inteiro(arquivo);
+
+	if (tamanho <= 0)
 	{
-		if (arquivo_entrada.fail() == true)
-		{
-			cout << "Erro na abertura de arquivo " + string(nome_arq_entrada) << endl;
-		}
+		cout << "Aviso: Tentativa de leitura de registro de tamanho 0." << endl;
+		return "";
+	}
 
-		else arquivo_entrada.close();
+	char registro[tamanho+1];
 
-		if (arquivo_inicial.fail() == true)
-		{
-			cout << "Erro na abertura de arquivo " + string(nome_arq_inicial) << endl;
-		}
+	arquivo.read((char *) registro, tamanho);
 
-		else arquivo_inicial.close();
+	return string(registro);
+}
 
+bool escrever_dados(ofstream& arquivo, string dados)
+{
+	if (dados.size() <= 0)
+	{
+		cout << "Aviso: Escrita de dados de tamanho 0." << endl;
 		return false;
 	}
 
-	// Guarda os primeiros bytes do arquivo para salvar a quantidade de registros
-	arquivo_inicial.seekp(sizeof(quantidade_registros), ios_base::beg);
+	arquivo.write((char *) dados.c_str(), (int) dados.size());
 
-	// Lê registros até não achar mais registros no arquivo (EOF)
-	while (arquivo_entrada.eof() == false)
+	if (arquivo.bad() == true)
 	{
-		std::getline(arquivo_entrada, registro);
-
-		if (registro.size() <= 0) break;
-
-		quantidade_registros++;
-
-		tamanho_registro = (int) registro.size();
-
-		arquivo_inicial.write((const char *) &tamanho_registro, sizeof(tamanho_registro));
-
-		arquivo_inicial.write((const char *) registro.c_str(), tamanho_registro);
+		cout << "Erro: Falha na escrita dos dados: " + dados << endl;
+		return false; 
 	}
-
-	// Volta para o início do arquivo
-	arquivo_inicial.seekp(0, ios_base::beg);
-
-	// Escreve a quantidade de registros no início (cabeçalho) do arquivo
-	arquivo_inicial.write((const char *) &quantidade_registros, sizeof(quantidade_registros));
-
-	arquivo_entrada.close();
-	arquivo_inicial.close();
-
-	// Checa se houve algum erro ocorreu, diferente de EOF / FAIL
-	// EOF / FAIL acontecem ao tentar ler no final do arquivo
-	if (arquivo_entrada.bad() or arquivo_inicial.bad()) return false;
 
 	return true;
 }
 
+bool escrever_dados(ofstream& arquivo, string dados, int tamanho)
+{
+	if (tamanho <= 0)
+	{
+		cout << "Erro: Escrita de dados de tamanho definido como 0 ou negativo." << endl;
+		return false;
+	}
 
+	if (tamanho < dados.size())
+	{
+		cout << "Aviso: Escrita de dados de tamanho definido menor que o tamanho real dos dados." << endl;
+	}
 
+	arquivo.write((char *) dados.c_str(), tamanho);
+
+	if (arquivo.bad() == true)
+	{
+		cout << "Erro: Falha na escrita dos dados: " + dados << endl;
+		return false; 
+	}
+
+	return true;
+}
 
 //IDEIA PRA FUNÇÃO
 
