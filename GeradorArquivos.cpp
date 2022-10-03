@@ -105,39 +105,61 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
     }
 }
 
-bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const char*nome_arq_titulo){
+
+
+
+bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const char *nome_arq_titulo){
 
 
 	Manipulador manipulador;
 
 	ifstream arquivo1;
 	ofstream arquivo2;
-	
+
 	arquivo1.open(nome_arq_inicial,ios::in);
 	arquivo2.open(nome_arq_titulo,ios::out);
 
 	string linha;
 
-	if(arquivo1.good()==false || arquivo2.good()==false){return false;}	
+	if(arquivo1.good()==false || arquivo2.good()==false){return false;}
 
+
+	//para ler a primeira linha que será descartada
+    linha = manipulador.ler_registro(arquivo1);
 
 	while(arquivo1.eof()==false){
 
 		linha = manipulador.ler_registro(arquivo1);
 
-		TituloNetflix Titulo(string linha);
+		TituloNetflix Titulo(linha);
+
 
 		arquivo2<<Titulo.id;
+
+
+		int sobra1 = 6 - Titulo.id.length();
+        for(int contador = 0;contador<sobra1;contador++){
+
+            arquivo2<<" ";
+		}
+
+
 		arquivo2<<';';
+
+
 		arquivo2<<Titulo.title;
+
+		int sobra2 = 105 - Titulo.title.length();
+		for(int contador = 0;contador<sobra2;contador++){
+
+            arquivo2<<" ";
+		}
+
+
 		arquivo2<<'\n';
 
 	}
-	
+
 	return true;
-
-
-
-
 
 }
