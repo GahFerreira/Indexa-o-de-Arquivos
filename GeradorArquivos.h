@@ -14,6 +14,7 @@ class GeradorArquivos
     public:
         bool criar_arquivo_inicial(const char *nome_arq_entrada, const char *nome_arq_inicial);
         bool criar_arquivo_indice_primario(const char *nome_arq_inicial, const char *nome_arq_indice_primario);
+        bool criar_arquivo_titulo(const char *nome_arq_inicial,const char *nome_arq_titulo);
 };
 
 #endif // GERADOR_ARQUIVOS_H_
