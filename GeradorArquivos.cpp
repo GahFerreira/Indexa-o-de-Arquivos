@@ -133,6 +133,8 @@ bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const c
 		arquivo2<<'\n';
 
 	}
+	
+	return true;
 
 
 
