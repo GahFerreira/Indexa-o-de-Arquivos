@@ -108,6 +108,8 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
 
 
 
+
+
 bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const char *nome_arq_titulo){
 
 
@@ -136,8 +138,10 @@ bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const c
 
 		arquivo2<<Titulo.id;
 
+		string auxiliar1(Titulo.id);
 
-		int sobra1 = 6 - Titulo.id.length();
+
+		int sobra1 = 6 - auxiliar1.length();
         for(int contador = 0;contador<sobra1;contador++){
 
             arquivo2<<" ";
@@ -147,9 +151,11 @@ bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const c
 		arquivo2<<';';
 
 
-		arquivo2<<Titulo.title;
+		arquivo2<<Titulo.titulo;
 
-		int sobra2 = 105 - Titulo.title.length();
+		string auxiliar2(Titulo.titulo);
+
+		int sobra2 = 105 - auxiliar2.length();
 		for(int contador = 0;contador<sobra2;contador++){
 
             arquivo2<<" ";
