@@ -77,30 +77,89 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 	return true;
 }
 
-// bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial, const char *nome_arq_indice_primario)
-// {
-//     struct RegistroFormatado
-//     {
-//         char id[TAM_ID+1];
-//         int bytes_do_inicio;
-//     };
+bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial, const char *nome_arq_indice_primario)
+{
+    struct RegistroFormatado
+    {
+        char id[TAM_ID+1];
+        int bytes_do_inicio;
+    };
     
-//     ifstream arquivo_inicial;
-//     ofstream arquivo_indice_primario;
-//     Manipulador manipulador;
-//     TituloNetflix tN;
+    ifstream arquivo_inicial;
+    ofstream arquivo_indice_primario;
+    Manipulador manipulador;
+    TituloNetflix tN;
 
-//     string registro;
-//     int quantidade_registros, tamanho_registro;
+    string registro;
+    int quantidade_registros, tamanho_registro;
 
-//     arquivo_inicial.open(nome_arq_inicial, ios_base::in);    
-//     arquivo_indice_primario.open(nome_arq_indice_primario, ios_base::out);
+    arquivo_inicial.open(nome_arq_inicial, ios_base::in);    
+    arquivo_indice_primario.open(nome_arq_indice_primario, ios_base::out);
 
-//     quantidade_registros = manipulador.ler_inteiro(arquivo_inicial);
+    quantidade_registros = manipulador.ler_inteiro(arquivo_inicial);
 
-//     while(arquivo_inicial.eof() == false)
-//     {
-//         registro = manipulador.ler_registro(arquivo_inicial);
+    while(arquivo_inicial.eof() == false)
+    {
+        registro = manipulador.ler_registro(arquivo_inicial);
         
-//     }
-// }
+    }
+}
+
+
+
+
+bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const char *nome_arq_titulo){
+
+
+	Manipulador manipulador;
+
+	ifstream arquivo1;
+	ofstream arquivo2;
+
+	arquivo1.open(nome_arq_inicial,ios::in);
+	arquivo2.open(nome_arq_titulo,ios::out);
+
+	string linha;
+
+	if(arquivo1.good()==false || arquivo2.good()==false){return false;}
+
+
+	//para ler a primeira linha que será descartada
+    linha = manipulador.ler_registro(arquivo1);
+
+	while(arquivo1.eof()==false){
+
+		linha = manipulador.ler_registro(arquivo1);
+
+		TituloNetflix Titulo(linha);
+
+
+		arquivo2<<Titulo.id;
+
+
+		int sobra1 = 6 - Titulo.id.length();
+        for(int contador = 0;contador<sobra1;contador++){
+
+            arquivo2<<" ";
+		}
+
+
+		arquivo2<<';';
+
+
+		arquivo2<<Titulo.title;
+
+		int sobra2 = 105 - Titulo.title.length();
+		for(int contador = 0;contador<sobra2;contador++){
+
+            arquivo2<<" ";
+		}
+
+
+		arquivo2<<'\n';
+
+	}
+
+	return true;
+
+}
