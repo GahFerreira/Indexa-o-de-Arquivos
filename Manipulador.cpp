@@ -206,5 +206,48 @@ TituloNetflix* Manipulador::gerar_array_de_titulos(const char *nome_arq_entrada)
 
 */
 
+//OUTRAS FUNÇÕES
+
+/*
+
+bool Manipulador::criar_arquivo_indice(const char *nome_arq,TituloNetflix* TN ){
+	
+	fstream arq_saida;
+	arq_saida.open(nome_arq,ios::out);
+	
+	int contador=0;
+	int pos = 0;
+	
+	if (nome_arq.good()){
+		
+		while(!nome_arq.eof()){
+				
+			nome_arq<<TN.id;
+			nome_arq<<";";
+			nome_arq<<pos;
+			nome_arq<<'\n';
+			//6 são os bits salvos para guardar o tamanho
+			pos=pos+TN[contador].tamanho_registro + 6;
+		
+		}
+		
+		nome_arq.close();
+		
+		return true;
+	
+	}
+	
+	else{return false;}
+	
+}
+
+
+bool Manipulador::criar_arquivo_titulo(const char *nome_arq_entrada,TituloNetflix* TN ){
+	
+	
+}
+
+
+*/
 
 
