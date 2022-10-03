@@ -62,7 +62,7 @@ TituloNetflix* Manipulador::gerar_array_de_titulos(const char *nome_arq_entrada)
 	
 	char c;
 	
-	while(arq_entrada.eof()){
+	while(!arq_entrada.eof()){
 		
 		while(c != '\n'){
 		
