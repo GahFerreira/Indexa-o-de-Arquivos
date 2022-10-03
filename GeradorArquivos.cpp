@@ -104,3 +104,38 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
         
     }
 }
+
+bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const char*nome_arq_titulo){
+
+
+	Manipulador manipulador;
+
+	ifstream arquivo1;
+	ofstream arquivo2;
+	
+	arquivo1.open(nome_arq_inicial,ios::in);
+	arquivo2.open(nome_arq_titulo,ios::out);
+
+	string linha;
+
+	if(arquivo1.good()==false || arquivo2.good()==false){return false;}	
+
+
+	while(arquivo1.eof()==false){
+
+		linha = manipulador.ler_registro(arquivo1);
+
+		TituloNetflix Titulo(string linha);
+
+		arquivo2<<Titulo.id;
+		arquivo2<<';';
+		arquivo2<<Titulo.title;
+		arquivo2<<'\n';
+
+	}
+
+
+
+
+
+}
