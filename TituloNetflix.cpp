@@ -17,24 +17,8 @@ string Lista::to_string() const
     return resultado;
 }
 
-/**
-* Construtor padrão de TituloNetflix.
-*/
-TituloNetflix::TituloNetflix()
+void TituloNetflix::string_para_titulo_netflix(string registro)
 {
-
-}
-
-/**
-* Construtor de TituloNetflix a partir da string registro.
-* Assume-se separação de campos por ';' e separação de subcampos por ','.
-*
-* registro: string que contém, idealmente, campos de TituloNetflix em formato de string.
-*/
-TituloNetflix::TituloNetflix(string registro)
-{
-    cout << "Chamou construtor\n";
-
     /**
      * id_campo: qual o campo atual do registro.
      * campo: string para ler de registro, um caractere por vez, até atingir o valor de um campo.
@@ -142,6 +126,25 @@ TituloNetflix::TituloNetflix(string registro)
         // Caso não foi encontrado delimitador, acrescenta-se o caractere atual a `campo`.
         else campo += *i;
     }
+}
+
+/**
+* Construtor padrão de TituloNetflix.
+*/
+TituloNetflix::TituloNetflix()
+{
+
+}
+
+/**
+* Construtor de TituloNetflix a partir da string registro.
+* Assume-se separação de campos por ';' e separação de subcampos por ','.
+*
+* registro: string que contém, idealmente, campos de TituloNetflix em formato de string.
+*/
+TituloNetflix::TituloNetflix(string registro)
+{
+    string_para_titulo_netflix(registro);
 }
 
 /**

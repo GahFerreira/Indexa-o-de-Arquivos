@@ -1,5 +1,10 @@
 #include "Manipulador.h"
 
+/**
+* Lê e retorna um inteiro de `arquivo`.
+*
+* arquivo: um arquivo que aceita operações de leitura.
+*/
 int Manipulador::ler_inteiro(ifstream& arquivo)
 {
 	int inteiro;
@@ -9,6 +14,10 @@ int Manipulador::ler_inteiro(ifstream& arquivo)
 	return inteiro;
 }
 
+/**
+* Lê e retorna um registro do arquivo em formato de string.
+* Primeiramente, lê o tamanho do registro, e depois lê a quantidade de bytes indicada por tamanho.
+*/
 string Manipulador::ler_registro(ifstream& arquivo)
 {
 	int tamanho;
@@ -29,48 +38,80 @@ string Manipulador::ler_registro(ifstream& arquivo)
 
 	string registro_retorno = string(registro);
 
-	delete[] registro;
+    delete[] registro;
 
 	return registro_retorno;
 }
 
-bool Manipulador::escrever_dados(ofstream& arquivo, string dados)
+bool Manipulador::escrever_inteiro(ofstream& arquivo, int inteiro)
 {
-	if (dados.size() <= 0)
+    arquivo.write((char *) &inteiro, sizeof(int));
+
+    if (arquivo.bad() == true)
+    {
+        cout << "Erro: Falha na escrita do inteiro: " << inteiro << endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool Manipulador::escrever_string(ofstream& arquivo, string str)
+{
+	if (str.size() <= 0)
 	{
-		cout << "Aviso: Escrita de dados de tamanho 0." << endl;
+		cout << "Aviso: Escrita de string de tamanho 0." << endl;
 		return false;
 	}
 
-	arquivo.write((char *) dados.c_str(), (int) dados.size());
+	arquivo.write((char *) str.c_str(), (int) str.size());
 
 	if (arquivo.bad() == true)
 	{
-		cout << "Erro: Falha na escrita dos dados: " + dados << endl;
+		cout << "Erro: Falha na escrita da string: " + str << endl;
 		return false;
 	}
 
 	return true;
 }
 
-bool Manipulador::escrever_dados(ofstream& arquivo, string dados, int tamanho)
+bool Manipulador::escrever_string(ofstream& arquivo, string str, int tamanho)
 {
 	if (tamanho <= 0)
+	{
+		cout << "Erro: Escrita de string de tamanho definido como 0 ou negativo." << endl;
+		return false;
+	}
+
+	if (tamanho < (int) str.size())
+	{
+		cout << "Aviso: Escrita de string de tamanho definido menor que o tamanho real da string." << endl;
+	}
+
+	arquivo.write((char *) str.c_str(), tamanho);
+
+	if (arquivo.bad() == true)
+	{
+		cout << "Erro: Falha na escrita da string: " + str << endl;
+		return false;
+	}
+
+	return true;
+}
+
+bool Manipulador::escrever_dados(ofstream& arquivo, void *dados, int tamanho)
+{
+    if (tamanho <= 0)
 	{
 		cout << "Erro: Escrita de dados de tamanho definido como 0 ou negativo." << endl;
 		return false;
 	}
 
-	if (tamanho < dados.size())
-	{
-		cout << "Aviso: Escrita de dados de tamanho definido menor que o tamanho real dos dados." << endl;
-	}
-
-	arquivo.write((char *) dados.c_str(), tamanho);
+	arquivo.write((char *) dados, tamanho);
 
 	if (arquivo.bad() == true)
 	{
-		cout << "Erro: Falha na escrita dos dados: " + dados << endl;
+		cout << "Erro: Falha na escrita de dados de tamanho " << tamanho << "." << endl;
 		return false;
 	}
 

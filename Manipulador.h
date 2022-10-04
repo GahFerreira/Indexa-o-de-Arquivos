@@ -13,8 +13,10 @@ class Manipulador
         int ler_inteiro(ifstream& arquivo);
         string ler_registro(ifstream& arquivo);
 
-        bool escrever_dados(ofstream& arquivo, string dados);
-        bool escrever_dados(ofstream& arquivo, string dados, int tamanho);
+        bool escrever_inteiro(ofstream& arquivo, int inteiro);
+        bool escrever_string(ofstream& arquivo, string dados);
+        bool escrever_string(ofstream& arquivo, string dados, int tamanho);
+        bool escrever_dados(ofstream& arquivo, void *dados, int tamanho);
 
         //criar essas funções depois
     /*

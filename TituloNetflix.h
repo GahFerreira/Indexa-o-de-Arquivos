@@ -28,6 +28,9 @@ class Lista
 class TituloNetflix
 {
     public:
+        // Indica o tamanho do registro quando dentro de um arquivo
+        int tamanho_registro;
+
         char id[TAM_ID+1];
         char tipo[TAM_TIPO+1];
         char titulo[TAM_TITULO+1];
@@ -40,14 +43,12 @@ class TituloNetflix
         char duracao[TAM_DURACAO+1];
         Lista listado_em;
         char descricao[TAM_DESCRICAO+1];
-        //pode precisar
-        //int tamanho_registro;
 
         TituloNetflix();
         TituloNetflix(string registro);
 
         void print() const;
-        void obter_registro();
+        void string_para_titulo_netflix(string registro);
 
         bool criar_arquivo_indice_primario(const char *nome_arq_inicial, const char *nome_arq_indice_primario);
 };

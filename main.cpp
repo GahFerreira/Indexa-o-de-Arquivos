@@ -29,15 +29,35 @@ int main()
         return -1;
     }
 
-    fstream A("arquivo_inicial.txt", ios_base::in);
+    ifstream A("arquivo_inicial.txt", ios_base::in | ios_base::binary);
 
-    cout << "Antes\n";
+    int tam = manipulador.ler_inteiro(A);
+    int inteiro = 0;
 
-    TituloNetflix superT(string("s1;TV Show;3%;;João Miguel, Bianca Comparato, Michel Gomes, Rodolfo Valente, Vaneza Oliveira, Rafael Lozano, Viviane Porto, Mel Fronckowiak, Sergio Mamberti, Zezé Motta, Celso Frateschi;Brazil;14/08/2020;2020;TV-MA;4 Seasons;International TV Shows, TV Dramas, TV Sci-Fi & Fantasy;In a future where the elite inhabit an island paradise far from the crowded slums, you get one chance to join the 3% saved from squalor."));
+    cout << "tam: " << tam << endl;
 
-    superT.print();
+    for (int i = 0; i < tam; i++)
+    {
+        if (A.eof() == true)
+        {
+            cout << "EOF ";
 
-    cout << "Depois\n";
+            if (i == tam)
+            {
+                cout << "Fim do arquivo quando i == tam\n";
+            }
+
+            else cout << "Fim do arquivo antes i == tam\n";
+
+            break;
+        }
+
+        else
+        {
+            cout << ++inteiro << " vezes\n";
+            manipulador.ler_registro(A);
+        }
+    }
 
     return 0;
 }

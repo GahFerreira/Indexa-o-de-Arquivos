@@ -14,10 +14,10 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 	ifstream arquivo_entrada;
     ofstream arquivo_inicial;
 	string registro;
-	int tamanho_registro, quantidade_registros;
+	int tamanho_registro, quantidade_registros = 0;
 
 	arquivo_entrada.open(nome_arq_entrada, ios_base::in);
-	arquivo_inicial.open(nome_arq_inicial, ios_base::out);
+	arquivo_inicial.open(nome_arq_inicial, ios_base::out | ios_base::binary);
 
 	// Checa a abertura dos arquivos
 	if (arquivo_entrada.fail() == true or arquivo_inicial.fail() == true)
@@ -50,9 +50,14 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 		// Se algum registro for lido com tamanho 0, passa para o próximo
 		// Idealmente isso só ocorrerá no final do arquivo
 		// Mas também ajuda com problemas de leitura de linhas vazias no meio do arquivo
-		if (registro.size() <= 0) continue;
+		if (registro.size() <= 0)
+        {
+            continue;
+        }
 
 		quantidade_registros++;
+
+		registro += '\n';
 
 		tamanho_registro = (int) registro.size();
 
@@ -90,23 +95,48 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
     Manipulador manipulador;
     TituloNetflix tN;
 
+    /**
+    * registro: string que recebe o registro lido do arquivo inicial
+    * quantidade_registros: variável que recebe a quantidade de registros lida do arquivo inicial
+    * tamanho_registro: variável que recebe o tamanho de um registro lido do arquivo inicial
+    * byte_atual: guarda o byte a partir do início do arquivo inicial em que começa um registro
+    */
     string registro;
-    int quantidade_registros, tamanho_registro;
+    int quantidade_registros, tamanho_registro, byte_atual;
 
     arquivo_inicial.open(nome_arq_inicial, ios_base::in);
     arquivo_indice_primario.open(nome_arq_indice_primario, ios_base::out);
 
+    // Lê-se a quantidade de registros do arquivo inicial
     quantidade_registros = manipulador.ler_inteiro(arquivo_inicial);
+    byte_atual += sizeof(int);
+
+    // Escreve-se a quantidade de registros no arquivo de índices
+    manipulador.escrever_inteiro(arquivo_indice_primario, quantidade_registros);
 
     while(arquivo_inicial.eof() == false)
     {
+        // Lê-se um registro do arquivo inicial
         registro = manipulador.ler_registro(arquivo_inicial);
 
+        // Converte o registro lido (string) para TituloNetflix
+        tN.string_para_titulo_netflix(registro);
+
+        // Cria um registro formatado, que será salvo no arquivo de índices primário
+        RegistroFormatado rF;
+        strcpy(rF.id, tN.id);
+        rF.bytes_do_inicio = byte_atual;
+
+        manipulador.escrever_dados(arquivo_indice_primario, (void *) &rF, (int) sizeof(rF));
+
+        // Atualiza o byte_atual para pular a quantidade de bytes lida do arquivo inicial
+        // `sizeof(int)` que é o inteiro indicador do tamanho do registro
+        // `registro.size()` que é o tamanho do registro
+        byte_atual += sizeof(int) + (int) registro.size();
     }
 }
 
 bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const char *nome_arq_titulo){
-
 
 	Manipulador manipulador;
 
