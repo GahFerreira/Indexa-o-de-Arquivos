@@ -9,7 +9,6 @@ int Manipulador::ler_inteiro(ifstream& arquivo)
 	return inteiro;
 }
 
-
 string Manipulador::ler_registro(ifstream& arquivo)
 {
 	int tamanho;

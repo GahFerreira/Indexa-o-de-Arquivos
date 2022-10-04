@@ -149,8 +149,6 @@ TituloNetflix::TituloNetflix(string registro)
 */
 void TituloNetflix::print() const
 {
-    cout << "Chamada do print " << endl << endl;
-
     cout
         << "TituloNetflix:" << endl
         << "\tId: " << id << endl
