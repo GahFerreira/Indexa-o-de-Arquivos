@@ -5,8 +5,8 @@
  * que contém 1 registro por linha, ler todos os registros do arquivo
  * e gerar um novo arquivo, denominado arquivo_inicial,
  * que contém os mesmos registros com o seu tamanho escrito antes.
- * 
- * nome_arq_entrada: nome do arquivo de entrada  
+ *
+ * nome_arq_entrada: nome do arquivo de entrada
  * nome_arq_inicial: nome do arquivo inicial (com registros e seu respectivo tamanho antes)
 */
 bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const char *nome_arq_inicial)
@@ -84,7 +84,7 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
         char id[TAM_ID+1];
         int bytes_do_inicio;
     };
-    
+
     ifstream arquivo_inicial;
     ofstream arquivo_indice_primario;
     Manipulador manipulador;
@@ -93,7 +93,7 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
     string registro;
     int quantidade_registros, tamanho_registro;
 
-    arquivo_inicial.open(nome_arq_inicial, ios_base::in);    
+    arquivo_inicial.open(nome_arq_inicial, ios_base::in);
     arquivo_indice_primario.open(nome_arq_indice_primario, ios_base::out);
 
     quantidade_registros = manipulador.ler_inteiro(arquivo_inicial);
@@ -101,14 +101,9 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
     while(arquivo_inicial.eof() == false)
     {
         registro = manipulador.ler_registro(arquivo_inicial);
-        
+
     }
 }
-
-
-
-
-
 
 bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const char *nome_arq_titulo){
 

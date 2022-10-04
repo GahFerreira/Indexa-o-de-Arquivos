@@ -31,7 +31,13 @@ int main()
 
     fstream A("arquivo_inicial.txt", ios_base::in);
 
+    cout << "Antes\n";
+
     TituloNetflix superT(string("s1;TV Show;3%;;João Miguel, Bianca Comparato, Michel Gomes, Rodolfo Valente, Vaneza Oliveira, Rafael Lozano, Viviane Porto, Mel Fronckowiak, Sergio Mamberti, Zezé Motta, Celso Frateschi;Brazil;14/08/2020;2020;TV-MA;4 Seasons;International TV Shows, TV Dramas, TV Sci-Fi & Fantasy;In a future where the elite inhabit an island paradise far from the crowded slums, you get one chance to join the 3% saved from squalor."));
+
+    superT.print();
+
+    cout << "Depois\n";
 
     return 0;
 }

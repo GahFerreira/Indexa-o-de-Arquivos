@@ -22,7 +22,7 @@ class Lista
     public:
         vector<string> lista;
 
-        char *to_string() const;
+        string to_string() const;
 };
 
 class TituloNetflix
