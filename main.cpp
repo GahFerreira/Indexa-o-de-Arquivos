@@ -147,6 +147,9 @@ int main()
 
     while (true)
     {
+        escolha.clear();
+        entrada.clear();
+
         cout 
         << "Digite " << ESCOLHA_ID << " para buscar um registro pelo SHOW_ID." << endl
         << "Digite " << ESCOLHA_TITULO << " para buscar um registro pelo TITULO." << endl
@@ -155,7 +158,10 @@ int main()
         << endl
         << "Digite o numero desejado: ";
 
-        cin >> escolha;
+        while (escolha.size() <= 0)
+        {
+            getline(cin, escolha);
+        } 
 
         try
         {
@@ -175,11 +181,16 @@ int main()
             continue;
         }
         
+        
+
         if (numero == ESCOLHA_ID)
         {
             cout << endl << "Voce escolheu ID." << endl << "Digite o ID: ";
 
-            cin >> entrada;
+            while (entrada.size() <= 0)
+            {
+                getline(cin, entrada);
+            } 
 
             // Transforma a string em minúscula
             for (auto& caractere : entrada)
@@ -230,7 +241,10 @@ int main()
         {
             cout << endl << "Voce escolheu TITULO." << endl << "Digite o TITULO: ";
 
-            cin >> entrada;
+            while (entrada.size() <= 0)
+            {
+                getline(cin, entrada);
+            } 
 
             // Transforma a string em minúscula
             for (auto& caractere : entrada)
