@@ -87,7 +87,7 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 }
 
 /**
- * Função com objetivo de criar o arquivo de índices primário.
+ * Função com objetivo de criar o arquivo de índices direto.
  * O arquivo começa com um cabeçalho indicando quantos registros guarda.
  * Cada registro tem tamanho fixo, e dois campos: {id, posição_arquivo_inicial} 
 */
@@ -156,7 +156,7 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
 			tN.id[i] = tolower(tN.id[i]);
 		}
 
-        // Cria um registro formatado, que será salvo no arquivo de índices primário
+        // Cria um registro formatado, que será salvo no arquivo de índices direto
         RegistroIndice rI;
         strcpy(rI.id, tN.id);
         rI.bytes_do_inicio = byte_atual;
@@ -180,7 +180,7 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
 }
 
 /**
- * Função que tem como objetivo criar um arquivo de índices secundários.
+ * Função que tem como objetivo criar um arquivo de índices indiretos.
  * O arquivo começa com um cabeçalho indicando quantos registros guarda.
  * Cada registro tem tamanho fixo, e dois campos: {titulo, id} 
 */

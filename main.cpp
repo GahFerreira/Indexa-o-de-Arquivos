@@ -57,7 +57,7 @@ int main()
         return -1;
     }
 
-    // ARQUIVO ÍNDICE PRIMÁRIO (ID -> POSIÇÃO)
+    // ARQUIVO ÍNDICE DIRETO (ID -> POSIÇÃO)
 
     if (geradorArquivos.criar_arquivo_indice_primario(ARQUIVO_INICIAL, ARQUIVO_INDICE))
     {
@@ -71,7 +71,7 @@ int main()
         return -1;
     }
 
-    // ARQUIVO ÍNDICE SECUNDÁRIO (TÍTULOS -> ID)
+    // ARQUIVO ÍNDICE indireto (TÍTULOS -> ID)
 
     if (geradorArquivos.criar_arquivo_titulo(ARQUIVO_INICIAL, ARQUIVO_TITULO))
     {
@@ -192,7 +192,7 @@ int main()
 
             RegistroIndice registrosIndice[quantidade_registros];          
 
-            // Leitura de todo o conteúdo do arquivo de índices primário de uma só vez
+            // Leitura de todo o conteúdo do arquivo de índices direto de uma só vez
             manipulador.ler_dados(arquivo_indice, quantidade_registros * sizeof(RegistroIndice), &registrosIndice[0]);
 
             vector<TituloNetflix> respostas;
@@ -244,12 +244,12 @@ int main()
 
             RegistroIndice registrosIndice[quantidade_registros];          
 
-            // Leitura de todo o conteúdo do arquivo de índices primário de uma só vez
+            // Leitura de todo o conteúdo do arquivo de índices direto de uma só vez
             manipulador.ler_dados(arquivo_indice, quantidade_registros * sizeof(RegistroIndice), &registrosIndice[0]);
 
             RegistroTitulo registrosTitulo[quantidade_registros];
 
-            // Leitura de todo o conteúdo do arquivo de índices secundário de uma só vez
+            // Leitura de todo o conteúdo do arquivo de índices indireto de uma só vez
             manipulador.ler_dados(arquivo_titulo, quantidade_registros * (int) sizeof(RegistroTitulo), &registrosTitulo[0]);
 
             vector<TituloNetflix> respostas;
@@ -263,7 +263,7 @@ int main()
                     // pelo id do par encontrado
                     for (int j = 0; j < quantidade_registros; j++)
                     {
-                        // Uma vez encontrado o id no arquivo de índices primário
+                        // Uma vez encontrado o id no arquivo de índices direto
                         // adiciona o TituloNetflix a respostas
                         if (string(registrosTitulo[i].id) == string(registrosIndice[j].id))
                         {
