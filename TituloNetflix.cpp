@@ -17,6 +17,10 @@ string Lista::to_string() const
     return resultado;
 }
 
+/**
+ * Transforma uma string, com conteúdo de um registro TituloNetflix 
+ * em um objeto TituloNetflix.
+*/
 void TituloNetflix::string_para_titulo_netflix(string registro)
 {
     /**
@@ -35,11 +39,6 @@ void TituloNetflix::string_para_titulo_netflix(string registro)
         // Posteriormente, encerra-se o for.
         if (i == registro.end())
         {
-            if (id_campo != 11)
-            {
-                cout << "Aviso: TituloNetflix criado a partir de string com campos faltando." << endl;
-            }
-
             switch(id_campo)
             {
                 case 0: strcpy(this->id, campo.c_str()); break;
@@ -56,12 +55,19 @@ void TituloNetflix::string_para_titulo_netflix(string registro)
                 case 11: strcpy(this->descricao, campo.c_str()); break;
             }
 
+            if (id_campo != 11)
+            {
+                cout << "Aviso: TituloNetflix criado a partir de string com campos faltando: " << endl;
+
+                this->print();
+            }
+
             break;
         }
 
         // Se foi encontrado um ';', significa que `campo` tem que ser atribuído a um campo de TituloNetflix,
         // e seu valor zerado.
-        else if (*i == ';')
+        else if (*i == ';' and id_campo < 11)
         {
             switch(id_campo)
             {

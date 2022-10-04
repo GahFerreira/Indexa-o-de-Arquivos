@@ -39,6 +39,10 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 		return false;
 	}
 
+	// Pula a primeira linha, que só contem os nomes das colunas
+	// Isso interfere na criação posterior dos outros arquivos
+	std::getline(arquivo_entrada, registro);
+
 	// Guarda os primeiros bytes do arquivo para salvar a quantidade de registros
 	arquivo_inicial.seekp(sizeof(quantidade_registros), ios_base::beg);
 
@@ -82,18 +86,16 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 	return true;
 }
 
+/**
+ * Função com objetivo de criar o arquivo de índices primário.
+ * O arquivo começa com um cabeçalho indicando quantos registros guarda.
+ * Cada registro tem tamanho fixo, e dois campos: {id, posição_arquivo_inicial} 
+*/
 bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial, const char *nome_arq_indice_primario)
 {
-    struct RegistroFormatado
-    {
-        char id[TAM_ID+1];
-        int bytes_do_inicio;
-    };
-
     ifstream arquivo_inicial;
     ofstream arquivo_indice_primario;
     Manipulador manipulador;
-    TituloNetflix tN;
 
     /**
     * registro: string que recebe o registro lido do arquivo inicial
@@ -102,10 +104,30 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
     * byte_atual: guarda o byte a partir do início do arquivo inicial em que começa um registro
     */
     string registro;
-    int quantidade_registros, tamanho_registro, byte_atual;
+    int quantidade_registros, byte_atual = 0;
 
-    arquivo_inicial.open(nome_arq_inicial, ios_base::in);
-    arquivo_indice_primario.open(nome_arq_indice_primario, ios_base::out);
+    arquivo_inicial.open(nome_arq_inicial, ios_base::in | ios_base::binary);
+    arquivo_indice_primario.open(nome_arq_indice_primario, ios_base::out | ios_base::binary);
+
+    // Checa a abertura dos arquivos
+	if (arquivo_inicial.fail() == true or arquivo_indice_primario.fail() == true)
+	{
+		if (arquivo_inicial.fail() == true)
+		{
+			cout << "Erro na abertura de arquivo " + string(nome_arq_inicial) << endl;
+		}
+
+		else arquivo_inicial.close();
+
+		if (arquivo_indice_primario.fail() == true)
+		{
+			cout << "Erro na abertura de arquivo " + string(nome_arq_indice_primario) << endl;
+		}
+
+		else arquivo_indice_primario.close();
+
+		return false;
+	}
 
     // Lê-se a quantidade de registros do arquivo inicial
     quantidade_registros = manipulador.ler_inteiro(arquivo_inicial);
@@ -119,78 +141,98 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
         // Lê-se um registro do arquivo inicial
         registro = manipulador.ler_registro(arquivo_inicial);
 
+		// Caso haja alguma linha vazia, pula ela
+        if (registro.size() <= 0)
+        {
+            continue;
+        }
+
         // Converte o registro lido (string) para TituloNetflix
-        tN.string_para_titulo_netflix(registro);
+        TituloNetflix tN(registro);
+
+		// Transforma o `id` para apenas minúsculas
+		for (int i = 0; i < TAM_ID+1 and tN.id[i] != '\0'; i++)
+		{
+			tN.id[i] = tolower(tN.id[i]);
+		}
 
         // Cria um registro formatado, que será salvo no arquivo de índices primário
-        RegistroFormatado rF;
-        strcpy(rF.id, tN.id);
-        rF.bytes_do_inicio = byte_atual;
+        RegistroIndice rI;
+        strcpy(rI.id, tN.id);
+        rI.bytes_do_inicio = byte_atual;
 
-        manipulador.escrever_dados(arquivo_indice_primario, (void *) &rF, (int) sizeof(rF));
+        manipulador.escrever_dados(arquivo_indice_primario, (void *) &rI, (int) sizeof(rI));
 
         // Atualiza o byte_atual para pular a quantidade de bytes lida do arquivo inicial
         // `sizeof(int)` que é o inteiro indicador do tamanho do registro
         // `registro.size()` que é o tamanho do registro
         byte_atual += sizeof(int) + (int) registro.size();
     }
-}
 
-bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const char *nome_arq_titulo){
+    arquivo_inicial.close();
+	arquivo_indice_primario.close();
 
-	Manipulador manipulador;
-
-	ifstream arquivo1;
-	ofstream arquivo2;
-
-	arquivo1.open(nome_arq_inicial,ios::in);
-	arquivo2.open(nome_arq_titulo,ios::out);
-
-	string linha;
-
-	if(arquivo1.good()==false || arquivo2.good()==false){return false;}
-
-
-	//para ler a primeira linha que será descartada
-    linha = manipulador.ler_registro(arquivo1);
-
-	while(arquivo1.eof()==false){
-
-		linha = manipulador.ler_registro(arquivo1);
-
-		TituloNetflix Titulo(linha);
-
-
-		arquivo2<<Titulo.id;
-
-		string auxiliar1(Titulo.id);
-
-
-		int sobra1 = 6 - auxiliar1.length();
-        for(int contador = 0;contador<sobra1;contador++){
-
-            arquivo2<<" ";
-		}
-
-
-		arquivo2<<';';
-
-
-		arquivo2<<Titulo.titulo;
-
-		string auxiliar2(Titulo.titulo);
-
-		int sobra2 = 105 - auxiliar2.length();
-		for(int contador = 0;contador<sobra2;contador++){
-
-            arquivo2<<" ";
-		}
-
-
-		arquivo2<<'\n';
-
-	}
+    // Checa se houve algum erro ocorreu, diferente de EOF / FAIL
+	// EOF / FAIL acontecem ao tentar ler no final do arquivo
+	if (arquivo_inicial.bad() or arquivo_indice_primario.bad()) return false;
 
 	return true;
+}
 
+/**
+ * Função que tem como objetivo criar um arquivo de índices secundários.
+ * O arquivo começa com um cabeçalho indicando quantos registros guarda.
+ * Cada registro tem tamanho fixo, e dois campos: {titulo, id} 
+*/
+bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const char *nome_arq_titulo)
+{
+	Manipulador manipulador;
+
+	ifstream arquivo_inicial;
+	ofstream arquivo_titulo;
+
+	arquivo_inicial.open(nome_arq_inicial,ios::in | ios::binary);
+	arquivo_titulo.open(nome_arq_titulo,ios::out | ios::binary);
+
+	if(arquivo_inicial.good()==false || arquivo_titulo.good()==false){return false;}
+
+	string registro;
+	int quantidade_registros;
+
+	// Escreve a quantidade de registros no cabeçalho do arquivo de títulos
+	quantidade_registros = manipulador.ler_inteiro(arquivo_inicial);
+	arquivo_titulo.write((char *) &quantidade_registros, sizeof(quantidade_registros));
+
+	while(arquivo_inicial.eof()==false)
+	{
+		registro = manipulador.ler_registro(arquivo_inicial);
+
+		if (registro.size() <= 0) continue;
+
+		TituloNetflix tN(registro);
+
+		// Transforma o título e o id para apenas letras minúsculas
+		for (int i = 0; i < TAM_TITULO+1 and tN.titulo[i] != '\0'; i++)
+		{
+			tN.titulo[i] = tolower(tN.titulo[i]);
+		}
+
+		for (int i = 0; i < TAM_ID+1 and tN.id[i] != '\0'; i++)
+		{
+			tN.id[i] = tolower(tN.id[i]);
+		}
+
+		RegistroTitulo rT;
+		strcpy(rT.titulo, tN.titulo);
+		strcpy(rT.id, tN.id);
+
+		manipulador.escrever_dados(arquivo_titulo, (void *) &rT, (int) sizeof(rT));
+	}
+
+	arquivo_inicial.close();
+	arquivo_titulo.close();
+
+	if (arquivo_inicial.bad() or arquivo_titulo.bad()) return false;
+
+	return true;
 }

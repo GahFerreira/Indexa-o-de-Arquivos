@@ -43,6 +43,24 @@ string Manipulador::ler_registro(ifstream& arquivo)
 	return registro_retorno;
 }
 
+/**
+ * Lê dados de um arquivo, de tamanho indicado por `tamanho`.
+ * Os dados são salvos na variável `destino`. 
+*/
+void Manipulador::ler_dados(ifstream& arquivo, int tamanho, void *destino)
+{
+	if (tamanho <= 0)
+	{
+		cout << "Aviso: Tentativa de leitura de dados de tamanho 0." << endl;
+		return;
+	}
+
+	arquivo.read((char *) destino, tamanho);
+}
+
+/**
+ * Escreve um inteiro no arquivo. 
+*/
 bool Manipulador::escrever_inteiro(ofstream& arquivo, int inteiro)
 {
     arquivo.write((char *) &inteiro, sizeof(int));
@@ -56,6 +74,9 @@ bool Manipulador::escrever_inteiro(ofstream& arquivo, int inteiro)
     return true;
 }
 
+/**
+ * Escreve uma string no arquivo. 
+*/
 bool Manipulador::escrever_string(ofstream& arquivo, string str)
 {
 	if (str.size() <= 0)
@@ -75,6 +96,10 @@ bool Manipulador::escrever_string(ofstream& arquivo, string str)
 	return true;
 }
 
+/**
+ * Escreve `tamanho` caracteres no arquivo, 
+ * começando pelo início da string `str`.
+*/
 bool Manipulador::escrever_string(ofstream& arquivo, string str, int tamanho)
 {
 	if (tamanho <= 0)
@@ -99,6 +124,10 @@ bool Manipulador::escrever_string(ofstream& arquivo, string str, int tamanho)
 	return true;
 }
 
+/**
+ * Escreve dados provindos da variável `dados`, 
+ * de tamanho indicado por `tamanho` no arquivo.
+*/
 bool Manipulador::escrever_dados(ofstream& arquivo, void *dados, int tamanho)
 {
     if (tamanho <= 0)
@@ -117,208 +146,3 @@ bool Manipulador::escrever_dados(ofstream& arquivo, void *dados, int tamanho)
 
 	return true;
 }
-
-//IDEIA PRA FUNÇÃO
-
-/*
-
-TituloNetflix* Manipulador::gerar_array_de_titulos(const char *nome_arq_entrada){
-
-	fstream arq_entrada;
-	arq_entrada.open(nome_arq_entrada, ios_base::in);
-
-	TituloNetflix titulos[8000];
-
-	int contador_registro = 0;
-
-	char c;
-
-	while(!arq_entrada.eof()){
-
-		while(c != '\n'){
-
-			contador_registro++;
-
-			string tam_registro ="";
-
-
-			//supondo o tamanho máximo do campo que indica o tamanho igual a 6
-			for(int contador=0; contador<6;contador++){
-
-				c=arq_entrada.get();
-
-				tam_registro += c;
-
-			}
-
-			//converter o valor do tamanho para int
-			int tam_registro_int = stoi(tam_registro);
-
-
-			//salva a informação do tamanho ocupado por aquele campo específico
-			titulos[contador_registro].tamanho_registro = tam_registro_int;
-
-			for(int contador = 0;contador < titulos[contador_registro].tamanho_registro;contador++){
-
-				//CADA WHILE PEGA UM CAMPO E PASSA PARA O RESPECTIVO ATRIBUTO DE TituloNetflix
-
-				while(c != ';'){
-
-               	 			//primeiro campo...
-
-					string auxiliar="";
-
-					c=arq_entrada.get();
-
-					if(c != ';'){
-						auxiliar+= c;
-					}
-
-
-
-				}
-
-				titulos[contador_registro].id = auxiliar;
-
-
-
-
-
-				while(c != ';'){
-
-                		//segundo campo...
-
-
-
-
-				}
-
-				while(c != ';'){
-
-				//terceiro campo...
-
-
-				}
-
-				while(c != ';'){
-
-
-
-
-				}
-
-				while(c != ';'){
-
-
-
-
-				}
-
-				while(c != ';'){
-
-
-
-
-				}
-
-				while(c != ';'){
-
-
-
-
-				}
-
-				while(c != ';'){
-
-
-
-
-				}
-
-				while(c != ';'){
-
-
-
-
-				}
-
-				while(c != ';'){
-
-
-
-
-				}
-
-				while(c != ';'){
-
-
-
-
-				}
-
-				while(c != ';'){
-
-
-
-
-				}
-
-
-
-			}
-
-		}
-
-	}
-
-
-
-}
-
-*/
-
-//OUTRAS FUNÇÕES
-
-/*
-
-bool Manipulador::criar_arquivo_indice(const char *nome_arq,TituloNetflix* TN ){
-
-	fstream arq_saida;
-	arq_saida.open(nome_arq,ios::out);
-
-	int contador=0;
-	int pos = 0;
-
-	if (nome_arq.good()){
-
-		while(!nome_arq.eof()){
-
-			nome_arq<<TN.id;
-			nome_arq<<";";
-			nome_arq<<pos;
-			nome_arq<<'\n';
-			//6 são os bits salvos para guardar o tamanho
-			pos=pos+TN[contador].tamanho_registro + 6;
-
-		}
-
-		nome_arq.close();
-
-		return true;
-
-	}
-
-	else{return false;}
-
-}
-
-
-bool Manipulador::criar_arquivo_titulo(const char *nome_arq_entrada,TituloNetflix* TN ){
-
-
-}
-
-
-*/
-
-
