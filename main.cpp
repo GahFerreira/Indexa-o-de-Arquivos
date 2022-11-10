@@ -34,7 +34,14 @@ int main()
 
     cout << "Inicio do Programa\n\n";
 
-    GeradorArquivos geradorArquivos;
+    vector<bool> campos(QTD_CAMPOS, false);
+    campos[ID_ID] = true;
+	campos[TIPO_ID] = true;
+	campos[TITULO_ID] = true;
+	campos[PAIS_ID] = true;
+	campos[ANO_LANCAMENTO_ID] = true;
+
+    GeradorArquivos geradorArquivos(campos);
     Manipulador manipulador;
 
     // INÍCIO CRIAÇÃO DOS ARQUIVOS
@@ -109,18 +116,18 @@ int main()
 
         if ((int) registro.size() < estatistica.tamanho_menor)
         {
-            estatistica.menor = TituloNetflix(registro);
+            estatistica.menor = TituloNetflix(registro, campos);
             estatistica.tamanho_menor = (int) registro.size();
             estatistica.posicao_menor = pos_atual;
         }
 
         if ((int) registro.size() > estatistica.tamanho_maior)
         {
-            estatistica.maior = TituloNetflix(registro);
+            estatistica.maior = TituloNetflix(registro, campos);
             estatistica.tamanho_maior = (int) registro.size();
             estatistica.posicao_maior = pos_atual;
         }
-        
+
         estatistica.tamanho_medio_registro += (double) registro.size();
         pos_atual += (int) sizeof(int) + (int) registro.size();
     }
@@ -142,7 +149,7 @@ int main()
 
     string escolha, entrada;
     int numero, quantidade_registros;
-    
+
     quantidade_registros = manipulador.ler_inteiro(arquivo_inicial);
 
     while (true)
@@ -150,7 +157,7 @@ int main()
         escolha.clear();
         entrada.clear();
 
-        cout 
+        cout
         << "Digite " << ESCOLHA_ID << " para buscar um registro pelo SHOW_ID." << endl
         << "Digite " << ESCOLHA_TITULO << " para buscar um registro pelo TITULO." << endl
         << "Digite " << ESTATISTICA << " para ver as estatisticas do arquivo de dados." << endl
@@ -161,14 +168,14 @@ int main()
         while (escolha.size() <= 0)
         {
             getline(cin, escolha);
-        } 
+        }
 
         try
         {
             // Tenta converter a `escolha` em um número
             numero = stoi(escolha);
 
-            if (numero != ESCOLHA_ID and 
+            if (numero != ESCOLHA_ID and
                 numero != ESCOLHA_TITULO and
                 numero != ESTATISTICA and
                 numero != FINALIZAR) throw exception();
@@ -180,8 +187,8 @@ int main()
 
             continue;
         }
-        
-        
+
+
 
         if (numero == ESCOLHA_ID)
         {
@@ -190,7 +197,7 @@ int main()
             while (entrada.size() <= 0)
             {
                 getline(cin, entrada);
-            } 
+            }
 
             // Transforma a string em minúscula
             for (auto& caractere : entrada)
@@ -201,7 +208,7 @@ int main()
             // Salta o cabeçalho
             arquivo_indice.seekg(sizeof(int), ios_base::beg);
 
-            RegistroIndice registrosIndice[quantidade_registros];          
+            RegistroIndice registrosIndice[quantidade_registros];
 
             // Leitura de todo o conteúdo do arquivo de índices direto de uma só vez
             manipulador.ler_dados(arquivo_indice, quantidade_registros * sizeof(RegistroIndice), &registrosIndice[0]);
@@ -217,7 +224,7 @@ int main()
 
                     string registro = manipulador.ler_registro(arquivo_inicial);
 
-                    respostas.push_back(TituloNetflix(registro));
+                    respostas.push_back(TituloNetflix(registro, campos));
                 }
             }
 
@@ -229,9 +236,9 @@ int main()
             {
                 cout << "RESULTADO: " << respostas.size() << " resultado(s) encontrado(s)." << endl;
 
-                for (int i = 0; i < respostas.size(); i++)
+                for (int i = 0; i < (int) respostas.size(); i++)
                 {
-                    respostas[i].print();
+                    respostas[i].print(campos);
                     cout << endl;
                 }
             }
@@ -244,7 +251,7 @@ int main()
             while (entrada.size() <= 0)
             {
                 getline(cin, entrada);
-            } 
+            }
 
             // Transforma a string em minúscula
             for (auto& caractere : entrada)
@@ -256,7 +263,7 @@ int main()
             arquivo_indice.seekg(sizeof(int), ios_base::beg);
             arquivo_titulo.seekg(sizeof(int), ios_base::beg);
 
-            RegistroIndice registrosIndice[quantidade_registros];          
+            RegistroIndice registrosIndice[quantidade_registros];
 
             // Leitura de todo o conteúdo do arquivo de índices direto de uma só vez
             manipulador.ler_dados(arquivo_indice, quantidade_registros * sizeof(RegistroIndice), &registrosIndice[0]);
@@ -287,7 +294,7 @@ int main()
 
                             string registro = manipulador.ler_registro(arquivo_inicial);
 
-                            respostas.push_back(TituloNetflix(registro));
+                            respostas.push_back(TituloNetflix(registro, campos));
 
                             break;
                         }
@@ -303,9 +310,9 @@ int main()
             {
                 cout << "RESULTADO: " << respostas.size() << " resultado(s) encontrado(s)." << endl;
 
-                for (int i = 0; i < respostas.size(); i++)
+                for (int i = 0; i < (int) respostas.size(); i++)
                 {
-                    respostas[i].print();
+                    respostas[i].print(campos);
                     cout << endl;
                 }
             }
@@ -317,27 +324,27 @@ int main()
                 << "ESTATISTICAS:" << endl
                 << '\t' << "Quantidade de Registros: " << estatistica.quantidade_registros << endl
                 << '\t' << "Tamanho Medio dos Registros: " << estatistica.tamanho_medio_registro << endl;
-                
+
             // Maior Registro
             arquivo_inicial.seekg(estatistica.posicao_maior, ios_base::beg);
-            cout 
+            cout
                 << '\t' << "Maior Registro:" << endl
                 << '\t' << "Tamanho: " << estatistica.tamanho_maior << endl
                 << '\t';
-                
-            TituloNetflix(manipulador.ler_registro(arquivo_inicial)).print();
-                
+
+            TituloNetflix(manipulador.ler_registro(arquivo_inicial), campos).print(campos);
+
             cout << endl;
 
             // Menor Registro
             arquivo_inicial.seekg(estatistica.posicao_menor, ios_base::beg);
-            cout 
+            cout
                 << '\t' << "Menor Registro:" << endl
                 << '\t' << "Tamanho: " << estatistica.tamanho_menor << endl
                 << '\t';
-                
-            TituloNetflix(manipulador.ler_registro(arquivo_inicial)).print();
-                
+
+            TituloNetflix(manipulador.ler_registro(arquivo_inicial), campos).print(campos);
+
             cout << endl;
         }
 

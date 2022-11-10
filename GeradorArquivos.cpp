@@ -1,10 +1,27 @@
 #include "GeradorArquivos.h"
 
+GeradorArquivos::GeradorArquivos()
+{
+	this->campos_a_serem_usados = vector<bool>(QTD_CAMPOS, true);
+}
+
+GeradorArquivos::GeradorArquivos(vector<bool>& campos)
+{
+	this->campos_a_serem_usados = campos;
+}
+
 /**
  * Função com objetivo de, a partir de um arquivo de entrada
  * que contém 1 registro por linha, ler todos os registros do arquivo
  * e gerar um novo arquivo, denominado arquivo_inicial,
  * que contém os mesmos registros com o seu tamanho escrito antes.
+ * 
+ * Nessa etapa, apenas os seguintes campos pré-definidos serão inclusos:
+ *   show_id
+ *   type
+ *   title
+ *   contry
+ *   release_year
  *
  * nome_arq_entrada: nome do arquivo de entrada
  * nome_arq_inicial: nome do arquivo inicial (com registros e seu respectivo tamanho antes)
@@ -61,13 +78,21 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 
 		quantidade_registros++;
 
-		registro += '\n';
+		TituloNetflix tN(registro);
 
-		tamanho_registro = (int) registro.size();
+		string registro_adaptado =
+			' ' +	// Caso o registro for excluído, '*' ficará presente neste local.
+			string(tN.id) + ';' +
+			string(tN.tipo) + ';' +
+			string(tN.titulo) + ';' +
+			tN.pais.to_string() + ';' +
+			to_string(tN.ano_lancamento);
+
+		tamanho_registro = (int) registro_adaptado.size();
 
 		arquivo_inicial.write((const char *) &tamanho_registro, sizeof(tamanho_registro));
 
-		arquivo_inicial.write((const char *) registro.c_str(), tamanho_registro);
+		arquivo_inicial.write((const char *) registro_adaptado.c_str(), tamanho_registro);
 	}
 
 	// Volta para o início do arquivo
@@ -148,7 +173,7 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
         }
 
         // Converte o registro lido (string) para TituloNetflix
-        TituloNetflix tN(registro);
+        TituloNetflix tN(registro, campos_a_serem_usados);
 
 		// Transforma o `id` para apenas minúsculas
 		for (int i = 0; i < TAM_ID+1 and tN.id[i] != '\0'; i++)
@@ -209,7 +234,7 @@ bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const c
 
 		if (registro.size() <= 0) continue;
 
-		TituloNetflix tN(registro);
+		TituloNetflix tN(registro, campos_a_serem_usados);
 
 		// Transforma o título e o id para apenas letras minúsculas
 		for (int i = 0; i < TAM_TITULO+1 and tN.titulo[i] != '\0'; i++)

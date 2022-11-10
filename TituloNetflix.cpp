@@ -20,15 +20,26 @@ string Lista::to_string() const
 /**
  * Transforma uma string, com conteúdo de um registro TituloNetflix 
  * em um objeto TituloNetflix.
+ * 
+ * A string possui os campos definidos em `campos`.
+ * Se `campos` possui todos os campos, isso representa que todos os campos estão presentes.
 */
-void TituloNetflix::string_para_titulo_netflix(string registro)
+void TituloNetflix::string_para_titulo_netflix(string registro, vector<bool>& campos)
 {
     /**
-     * id_campo: qual o campo atual do registro.
      * campo: string para ler de registro, um caractere por vez, até atingir o valor de um campo.
+     * campos_registro: quais os campos a string `registro` possui.
+     * id_campo_atual: qual o índice do campo atual do registro. Aponta inicialmente para a primeira posição de `campos_registro`.
     */
-    int id_campo = 0;
     string campo;
+    vector<int> campos_registro;
+    int id_campo_atual = 0;
+
+    // Gera os campos que serão utilizados a partir da variável de entrada `campos`.
+    for (int i_campo = 0; i_campo < QTD_CAMPOS; i_campo++)
+    {
+        if (campos[i_campo] == true) campos_registro.push_back(i_campo);
+    }
 
     // Itera-se pela string registro, extraindo os campos.
     // Lê-se um caractere de cada vez.
@@ -39,7 +50,7 @@ void TituloNetflix::string_para_titulo_netflix(string registro)
         // Posteriormente, encerra-se o for.
         if (i == registro.end())
         {
-            switch(id_campo)
+            switch(campos_registro[id_campo_atual])
             {
                 case 0: strcpy(this->id, campo.c_str()); break;
                 case 1: strcpy(this->tipo, campo.c_str()); break;
@@ -55,11 +66,11 @@ void TituloNetflix::string_para_titulo_netflix(string registro)
                 case 11: strcpy(this->descricao, campo.c_str()); break;
             }
 
-            if (id_campo != 11)
+            if (campos_registro[id_campo_atual] != campos_registro.back())
             {
                 cout << "Aviso: TituloNetflix criado a partir de string com campos faltando: " << endl;
 
-                this->print();
+                this->print(campos);
             }
 
             break;
@@ -67,9 +78,9 @@ void TituloNetflix::string_para_titulo_netflix(string registro)
 
         // Se foi encontrado um ';', significa que `campo` tem que ser atribuído a um campo de TituloNetflix,
         // e seu valor zerado.
-        else if (*i == ';' and id_campo < 11)
+        else if (*i == ';' and campos_registro[id_campo_atual] < 11)
         {
-            switch(id_campo)
+            switch(campos_registro[id_campo_atual])
             {
                 case 0: strcpy(this->id, campo.c_str()); break;
                 case 1: strcpy(this->tipo, campo.c_str()); break;
@@ -89,7 +100,7 @@ void TituloNetflix::string_para_titulo_netflix(string registro)
 
             // Ao achar um ';', o conteúdo de `campo` é assinalado a um campo de TituloNetflix,
             // e passamos ao próximo campo.
-            id_campo++;
+            id_campo_atual++;
 
             // Aqui, verifica-se caso os caracteres após a vírgula são espaços
             // Enquanto forem espaços, pula aqueles caracteres
@@ -106,7 +117,7 @@ void TituloNetflix::string_para_titulo_netflix(string registro)
         // Nesse caso, salva-se cada ator individualmente dentro de uma lista.
         else if (*i == ',')
         {
-            switch(id_campo)
+            switch(campos_registro[id_campo_atual])
             {
                 case 3: this->diretor.lista.push_back(campo); break;
                 case 4: this->elenco.lista.push_back(campo); break;
@@ -150,26 +161,52 @@ TituloNetflix::TituloNetflix()
 */
 TituloNetflix::TituloNetflix(string registro)
 {
-    string_para_titulo_netflix(registro);
+    // Como neste construtor todos os campos do registro serão utilizados,
+    // criamos `campos` com QTD_CAMPOS posições, e todas as posições são `true`.
+    // Ou seja, a string `registro` possui todos os campos de TituloNetflix.
+    vector<bool> campos(QTD_CAMPOS, true);
+
+    string_para_titulo_netflix(registro, campos);
+}
+
+/**
+* Construtor de TituloNetflix a partir da string registro.
+* Assume-se separação de campos por ';' e separação de subcampos por ','.
+*
+* registro: string que contém, idealmente, campos de TituloNetflix em formato de string.
+* campos: um vetor de QTD_CAMPOS posições, em que cada uma possui `true` se a string `registro` tiver aquele campo, e `false` se não tiver.
+*/
+TituloNetflix::TituloNetflix(string registro, vector<bool>& campos)
+{
+    string_para_titulo_netflix(registro, campos);
 }
 
 /**
 * Função que printa no console o conteúdo de um TituloNetlix.
 */
-void TituloNetflix::print() const
+void TituloNetflix::print(vector<bool>& campos) const
 {
-    cout
-        << "TituloNetflix:" << endl
-        << "\tId: " << id << endl
-        << "\tTipo: " << tipo << endl
-        << "\tTitulo: " << titulo << endl
-        << "\tDiretor(es): " << diretor.to_string() << endl
-        << "\tElenco: " << elenco.to_string() << endl
-        << "\tPais(es): " << pais.to_string() << endl
-        << "\tData: " << data << endl
-        << "\tAno Lancamento: " << ano_lancamento << endl
-        << "\tAvaliacao: " << avaliacao << endl
-        << "\tDuracao: " << duracao << endl
-        << "\tListado em: " << listado_em.to_string() << endl
-        << "\tDescricao: " << descricao << endl;
+    cout << "TituloNetflix:" << endl;
+
+    for (int i_campo = 0; i_campo < QTD_CAMPOS; i_campo++)
+    {
+        if (campos[i_campo] == true)
+        {
+            switch(i_campo)
+            {
+                case ID_ID: cout << "\tId: " << id << endl; break;
+                case TIPO_ID: cout << "\tTipo: " << tipo << endl; break;
+                case TITULO_ID: cout << "\tTitulo: " << titulo << endl; break;
+                case DIRETOR_ID: cout << "\tDiretor(es): " << diretor.to_string() << endl; break;
+                case ELENCO_ID: cout << "\tElenco: " << elenco.to_string() << endl; break;
+                case PAIS_ID: cout << "\tPais(es): " << pais.to_string() << endl; break;
+                case DATA_ID: cout << "\tData: " << data << endl; break;
+                case ANO_LANCAMENTO_ID: cout << "\tAno Lancamento: " << ano_lancamento << endl; break;
+                case AVALIACAO_ID: cout << "\tAvaliacao: " << avaliacao << endl; break;
+                case DURACAO_ID: cout << "\tDuracao: " << duracao << endl; break;
+                case LISTADO_EM_ID: cout << "\tListado em: " << listado_em.to_string() << endl; break;
+                case DESCRICAO_ID: cout << "\tDescricao: " << descricao << endl;; break;
+            }
+        }
+    }
 }
