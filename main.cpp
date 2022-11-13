@@ -5,7 +5,7 @@
 #include "GeradorArquivos.h"
 
 #define ARQUIVO_ENTRADA "netflix_titles.csv"
-#define ARQUIVO_INICIAL "arquivo_inicial.txt"
+#define ARQUIVO_DADOS "arquivo_dados.txt"
 #define ARQUIVO_INDICE "arquivo_indice.txt"
 #define ARQUIVO_TITULO "arquivo_titulo.txt"
 
@@ -48,11 +48,11 @@ int main()
 
     cout
         << "Arquivo de entrada: " << ARQUIVO_ENTRADA << endl
-        << "Lendo arquivo de entrada e gerando arquivo inicial" << endl;
+        << "Lendo arquivo de entrada e gerando arquivo de dados" << endl;
 
-    // ARQUIVO INICIAL
+    // ARQUIVO DADOS
 
-    if (geradorArquivos.criar_arquivo_inicial(ARQUIVO_ENTRADA, ARQUIVO_INICIAL))
+    if (geradorArquivos.criar_arquivo_dados(ARQUIVO_ENTRADA, ARQUIVO_DADOS))
     {
         cout << "Leitura do arquivo de entrada e criacao do novo arquivo bem sucedidos\n";
     }
@@ -66,7 +66,7 @@ int main()
 
     // ARQUIVO ÍNDICE DIRETO (ID -> POSIÇÃO)
 
-    if (geradorArquivos.criar_arquivo_indice_primario(ARQUIVO_INICIAL, ARQUIVO_INDICE))
+    if (geradorArquivos.criar_arquivo_indice_primario(ARQUIVO_DADOS, ARQUIVO_INDICE))
     {
         cout << "Criacao do arquivo indice bem sucedido\n";
     }
@@ -80,7 +80,7 @@ int main()
 
     // ARQUIVO ÍNDICE indireto (TÍTULOS -> ID)
 
-    if (geradorArquivos.criar_arquivo_titulo(ARQUIVO_INICIAL, ARQUIVO_TITULO))
+    if (geradorArquivos.criar_arquivo_titulo(ARQUIVO_DADOS, ARQUIVO_TITULO))
     {
         cout << "Criacao do arquivo titulo bem sucedido\n";
     }
@@ -96,7 +96,7 @@ int main()
 
     // INÍCIO GERAÇÃO ESTATISTICA
 
-    ifstream arquivo_inicial;
+    ifstream arquivo_dados;
 
     Estatistica estatistica;
     estatistica.tamanho_maior = -1;
@@ -105,14 +105,14 @@ int main()
 
     int pos_atual = 0;
 
-    arquivo_inicial.open(ARQUIVO_INICIAL, ios_base::in | ios_base::binary);
+    arquivo_dados.open(ARQUIVO_DADOS, ios_base::in | ios_base::binary);
 
-    estatistica.quantidade_registros = manipulador.ler_inteiro(arquivo_inicial);
+    estatistica.quantidade_registros = manipulador.ler_inteiro(arquivo_dados);
     pos_atual += sizeof(int);
 
     for (int i = 0; i < estatistica.quantidade_registros; i++)
     {
-        string registro = manipulador.ler_registro(arquivo_inicial);
+        string registro = manipulador.ler_registro(arquivo_dados);
 
         if ((int) registro.size() < estatistica.tamanho_menor)
         {
@@ -136,21 +136,21 @@ int main()
 
     cout << "Estatisticas geradas." << endl;
 
-    arquivo_inicial.close();
+    arquivo_dados.close();
 
     // INÍCIO DA BUSCA
 
-    // `arquivo_inicial` já foi declarado anteriormente
+    // `arquivo_dados` já foi declarado anteriormente
     ifstream arquivo_indice, arquivo_titulo;
 
-    arquivo_inicial.open(ARQUIVO_INICIAL, ios_base::in | ios_base::binary);
+    arquivo_dados.open(ARQUIVO_DADOS, ios_base::in | ios_base::binary);
 	arquivo_indice.open(ARQUIVO_INDICE, ios_base::in | ios_base::binary);
 	arquivo_titulo.open(ARQUIVO_TITULO, ios_base::in | ios_base::binary);
 
     string escolha, entrada;
     int numero, quantidade_registros;
 
-    quantidade_registros = manipulador.ler_inteiro(arquivo_inicial);
+    quantidade_registros = manipulador.ler_inteiro(arquivo_dados);
 
     while (true)
     {
@@ -220,9 +220,9 @@ int main()
                 // Encontrou par
                 if (string(registrosIndice[i].id).find(entrada) != string::npos)
                 {
-                    arquivo_inicial.seekg(registrosIndice[i].bytes_do_inicio, ios_base::beg);
+                    arquivo_dados.seekg(registrosIndice[i].bytes_do_inicio, ios_base::beg);
 
-                    string registro = manipulador.ler_registro(arquivo_inicial);
+                    string registro = manipulador.ler_registro(arquivo_dados);
 
                     respostas.push_back(TituloNetflix(registro, campos));
                 }
@@ -288,11 +288,11 @@ int main()
                         // adiciona o TituloNetflix a respostas
                         if (string(registrosTitulo[i].id) == string(registrosIndice[j].id))
                         {
-                            // Posiciona a leitura no arquivo inicial na posição
+                            // Posiciona a leitura no arquivo de dados na posição
                             // do registro pareado
-                            arquivo_inicial.seekg(registrosIndice[j].bytes_do_inicio, ios_base::beg);
+                            arquivo_dados.seekg(registrosIndice[j].bytes_do_inicio, ios_base::beg);
 
-                            string registro = manipulador.ler_registro(arquivo_inicial);
+                            string registro = manipulador.ler_registro(arquivo_dados);
 
                             respostas.push_back(TituloNetflix(registro, campos));
 
@@ -326,24 +326,24 @@ int main()
                 << '\t' << "Tamanho Medio dos Registros: " << estatistica.tamanho_medio_registro << endl;
 
             // Maior Registro
-            arquivo_inicial.seekg(estatistica.posicao_maior, ios_base::beg);
+            arquivo_dados.seekg(estatistica.posicao_maior, ios_base::beg);
             cout
                 << '\t' << "Maior Registro:" << endl
                 << '\t' << "Tamanho: " << estatistica.tamanho_maior << endl
                 << '\t';
 
-            TituloNetflix(manipulador.ler_registro(arquivo_inicial), campos).print(campos);
+            TituloNetflix(manipulador.ler_registro(arquivo_dados), campos).print(campos);
 
             cout << endl;
 
             // Menor Registro
-            arquivo_inicial.seekg(estatistica.posicao_menor, ios_base::beg);
+            arquivo_dados.seekg(estatistica.posicao_menor, ios_base::beg);
             cout
                 << '\t' << "Menor Registro:" << endl
                 << '\t' << "Tamanho: " << estatistica.tamanho_menor << endl
                 << '\t';
 
-            TituloNetflix(manipulador.ler_registro(arquivo_inicial), campos).print(campos);
+            TituloNetflix(manipulador.ler_registro(arquivo_dados), campos).print(campos);
 
             cout << endl;
         }
@@ -356,7 +356,7 @@ int main()
         }
     }
 
-    arquivo_inicial.close();
+    arquivo_dados.close();
     arquivo_indice.close();
     arquivo_titulo.close();
 

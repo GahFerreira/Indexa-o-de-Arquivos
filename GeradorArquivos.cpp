@@ -1,5 +1,9 @@
 #include "GeradorArquivos.h"
 
+/**
+ * Os arquivos a serem gerador conterão apenas os campos de TituloNetflix
+ * definidos pelo vetor `campos_a_serem_usados`.
+*/
 GeradorArquivos::GeradorArquivos()
 {
 	this->campos_a_serem_usados = vector<bool>(QTD_CAMPOS, true);
@@ -13,7 +17,7 @@ GeradorArquivos::GeradorArquivos(vector<bool>& campos)
 /**
  * Função com objetivo de, a partir de um arquivo de entrada
  * que contém 1 registro por linha, ler todos os registros do arquivo
- * e gerar um novo arquivo, denominado arquivo_inicial,
+ * e gerar um novo arquivo, denominado arquivo_dados,
  * que contém os mesmos registros com o seu tamanho escrito antes.
  * 
  * Nessa etapa, apenas os seguintes campos pré-definidos serão inclusos:
@@ -24,20 +28,20 @@ GeradorArquivos::GeradorArquivos(vector<bool>& campos)
  *   release_year
  *
  * nome_arq_entrada: nome do arquivo de entrada
- * nome_arq_inicial: nome do arquivo inicial (com registros e seu respectivo tamanho antes)
+ * nome_arq_dados: nome do arquivo de dados (com registros e seu respectivo tamanho antes)
 */
-bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const char *nome_arq_inicial)
+bool GeradorArquivos::criar_arquivo_dados(const char *nome_arq_entrada, const char *nome_arq_dados)
 {
 	ifstream arquivo_entrada;
-    ofstream arquivo_inicial;
+    ofstream arquivo_dados;
 	string registro;
 	int tamanho_registro, quantidade_registros = 0;
 
 	arquivo_entrada.open(nome_arq_entrada, ios_base::in);
-	arquivo_inicial.open(nome_arq_inicial, ios_base::out | ios_base::binary);
+	arquivo_dados.open(nome_arq_dados, ios_base::out | ios_base::binary);
 
 	// Checa a abertura dos arquivos
-	if (arquivo_entrada.fail() == true or arquivo_inicial.fail() == true)
+	if (arquivo_entrada.fail() == true or arquivo_dados.fail() == true)
 	{
 		if (arquivo_entrada.fail() == true)
 		{
@@ -46,12 +50,12 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 
 		else arquivo_entrada.close();
 
-		if (arquivo_inicial.fail() == true)
+		if (arquivo_dados.fail() == true)
 		{
-			cout << "Erro na abertura de arquivo " + string(nome_arq_inicial) << endl;
+			cout << "Erro na abertura de arquivo " + string(nome_arq_dados) << endl;
 		}
 
-		else arquivo_inicial.close();
+		else arquivo_dados.close();
 
 		return false;
 	}
@@ -61,7 +65,7 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 	std::getline(arquivo_entrada, registro);
 
 	// Guarda os primeiros bytes do arquivo para salvar a quantidade de registros
-	arquivo_inicial.seekp(sizeof(quantidade_registros), ios_base::beg);
+	arquivo_dados.seekp(sizeof(quantidade_registros), ios_base::beg);
 
 	// Lê registros até não achar mais registros no arquivo (EOF)
 	while (arquivo_entrada.eof() == false)
@@ -81,7 +85,6 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 		TituloNetflix tN(registro);
 
 		string registro_adaptado =
-			' ' +	// Caso o registro for excluído, '*' ficará presente neste local.
 			string(tN.id) + ';' +
 			string(tN.tipo) + ';' +
 			string(tN.titulo) + ';' +
@@ -90,23 +93,23 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 
 		tamanho_registro = (int) registro_adaptado.size();
 
-		arquivo_inicial.write((const char *) &tamanho_registro, sizeof(tamanho_registro));
+		arquivo_dados.write((const char *) &tamanho_registro, sizeof(tamanho_registro));
 
-		arquivo_inicial.write((const char *) registro_adaptado.c_str(), tamanho_registro);
+		arquivo_dados.write((const char *) registro_adaptado.c_str(), tamanho_registro);
 	}
 
 	// Volta para o início do arquivo
-	arquivo_inicial.seekp(0, ios_base::beg);
+	arquivo_dados.seekp(0, ios_base::beg);
 
 	// Escreve a quantidade de registros no início (cabeçalho) do arquivo
-	arquivo_inicial.write((const char *) &quantidade_registros, sizeof(quantidade_registros));
+	arquivo_dados.write((const char *) &quantidade_registros, sizeof(quantidade_registros));
 
 	arquivo_entrada.close();
-	arquivo_inicial.close();
+	arquivo_dados.close();
 
 	// Checa se houve algum erro ocorreu, diferente de EOF / FAIL
 	// EOF / FAIL acontecem ao tentar ler no final do arquivo
-	if (arquivo_entrada.bad() or arquivo_inicial.bad()) return false;
+	if (arquivo_entrada.bad() or arquivo_dados.bad()) return false;
 
 	return true;
 }
@@ -114,35 +117,35 @@ bool GeradorArquivos::criar_arquivo_inicial(const char *nome_arq_entrada, const 
 /**
  * Função com objetivo de criar o arquivo de índices direto.
  * O arquivo começa com um cabeçalho indicando quantos registros guarda.
- * Cada registro tem tamanho fixo, e dois campos: {id, posição_arquivo_inicial} 
+ * Cada registro tem tamanho fixo, e dois campos: {id, posição_arquivo_dados} 
 */
-bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial, const char *nome_arq_indice_primario)
+bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_dados, const char *nome_arq_indice_primario)
 {
-    ifstream arquivo_inicial;
+    ifstream arquivo_dados;
     ofstream arquivo_indice_primario;
     Manipulador manipulador;
 
     /**
-    * registro: string que recebe o registro lido do arquivo inicial
-    * quantidade_registros: variável que recebe a quantidade de registros lida do arquivo inicial
-    * tamanho_registro: variável que recebe o tamanho de um registro lido do arquivo inicial
-    * byte_atual: guarda o byte a partir do início do arquivo inicial em que começa um registro
+    * registro: string que recebe o registro lido do arquivo de dados
+    * quantidade_registros: variável que recebe a quantidade de registros lida do arquivo de dados
+    * tamanho_registro: variável que recebe o tamanho de um registro lido do arquivo de dados
+    * byte_atual: guarda o byte a partir do início do arquivo de dados em que começa um registro
     */
     string registro;
     int quantidade_registros, byte_atual = 0;
 
-    arquivo_inicial.open(nome_arq_inicial, ios_base::in | ios_base::binary);
+    arquivo_dados.open(nome_arq_dados, ios_base::in | ios_base::binary);
     arquivo_indice_primario.open(nome_arq_indice_primario, ios_base::out | ios_base::binary);
 
     // Checa a abertura dos arquivos
-	if (arquivo_inicial.fail() == true or arquivo_indice_primario.fail() == true)
+	if (arquivo_dados.fail() == true or arquivo_indice_primario.fail() == true)
 	{
-		if (arquivo_inicial.fail() == true)
+		if (arquivo_dados.fail() == true)
 		{
-			cout << "Erro na abertura de arquivo " + string(nome_arq_inicial) << endl;
+			cout << "Erro na abertura de arquivo " + string(nome_arq_dados) << endl;
 		}
 
-		else arquivo_inicial.close();
+		else arquivo_dados.close();
 
 		if (arquivo_indice_primario.fail() == true)
 		{
@@ -154,17 +157,17 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
 		return false;
 	}
 
-    // Lê-se a quantidade de registros do arquivo inicial
-    quantidade_registros = manipulador.ler_inteiro(arquivo_inicial);
+    // Lê-se a quantidade de registros do arquivo de dados
+    quantidade_registros = manipulador.ler_inteiro(arquivo_dados);
     byte_atual += sizeof(int);
 
     // Escreve-se a quantidade de registros no arquivo de índices
     manipulador.escrever_inteiro(arquivo_indice_primario, quantidade_registros);
 
-    while(arquivo_inicial.eof() == false)
+    while(arquivo_dados.eof() == false)
     {
-        // Lê-se um registro do arquivo inicial
-        registro = manipulador.ler_registro(arquivo_inicial);
+        // Lê-se um registro do arquivo de dados
+        registro = manipulador.ler_registro(arquivo_dados);
 
 		// Caso haja alguma linha vazia, pula ela
         if (registro.size() <= 0)
@@ -188,18 +191,18 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
 
         manipulador.escrever_dados(arquivo_indice_primario, (void *) &rI, (int) sizeof(rI));
 
-        // Atualiza o byte_atual para pular a quantidade de bytes lida do arquivo inicial
+        // Atualiza o byte_atual para pular a quantidade de bytes lida do arquivo de dados
         // `sizeof(int)` que é o inteiro indicador do tamanho do registro
         // `registro.size()` que é o tamanho do registro
         byte_atual += sizeof(int) + (int) registro.size();
     }
 
-    arquivo_inicial.close();
+    arquivo_dados.close();
 	arquivo_indice_primario.close();
 
     // Checa se houve algum erro ocorreu, diferente de EOF / FAIL
 	// EOF / FAIL acontecem ao tentar ler no final do arquivo
-	if (arquivo_inicial.bad() or arquivo_indice_primario.bad()) return false;
+	if (arquivo_dados.bad() or arquivo_indice_primario.bad()) return false;
 
 	return true;
 }
@@ -209,28 +212,28 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_inicial
  * O arquivo começa com um cabeçalho indicando quantos registros guarda.
  * Cada registro tem tamanho fixo, e dois campos: {titulo, id} 
 */
-bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const char *nome_arq_titulo)
+bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_dados, const char *nome_arq_titulo)
 {
 	Manipulador manipulador;
 
-	ifstream arquivo_inicial;
+	ifstream arquivo_dados;
 	ofstream arquivo_titulo;
 
-	arquivo_inicial.open(nome_arq_inicial,ios::in | ios::binary);
+	arquivo_dados.open(nome_arq_dados,ios::in | ios::binary);
 	arquivo_titulo.open(nome_arq_titulo,ios::out | ios::binary);
 
-	if(arquivo_inicial.good()==false || arquivo_titulo.good()==false){return false;}
+	if(arquivo_dados.good()==false || arquivo_titulo.good()==false){return false;}
 
 	string registro;
 	int quantidade_registros;
 
 	// Escreve a quantidade de registros no cabeçalho do arquivo de títulos
-	quantidade_registros = manipulador.ler_inteiro(arquivo_inicial);
+	quantidade_registros = manipulador.ler_inteiro(arquivo_dados);
 	arquivo_titulo.write((char *) &quantidade_registros, sizeof(quantidade_registros));
 
-	while(arquivo_inicial.eof()==false)
+	while(arquivo_dados.eof()==false)
 	{
-		registro = manipulador.ler_registro(arquivo_inicial);
+		registro = manipulador.ler_registro(arquivo_dados);
 
 		if (registro.size() <= 0) continue;
 
@@ -254,10 +257,10 @@ bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_inicial, const c
 		manipulador.escrever_dados(arquivo_titulo, (void *) &rT, (int) sizeof(rT));
 	}
 
-	arquivo_inicial.close();
+	arquivo_dados.close();
 	arquivo_titulo.close();
 
-	if (arquivo_inicial.bad() or arquivo_titulo.bad()) return false;
+	if (arquivo_dados.bad() or arquivo_titulo.bad()) return false;
 
 	return true;
 }
