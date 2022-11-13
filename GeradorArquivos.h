@@ -25,6 +25,9 @@ struct RegistroTitulo
     char quebra_linha = '\n';
 };
 
+/**
+ * Classe para gerar os arquivos de dados e de indexação. 
+*/
 class GeradorArquivos
 {
     public:
@@ -36,8 +39,6 @@ class GeradorArquivos
         bool criar_arquivo_inicial(const char *nome_arq_entrada, const char *nome_arq_inicial);
         bool criar_arquivo_indice_primario(const char *nome_arq_inicial, const char *nome_arq_indice_primario);
         bool criar_arquivo_titulo(const char *nome_arq_inicial,const char *nome_arq_titulo);
-
-        TituloNetflix *busca_titulo(const char *nome_arq_inicial, const char *nome_arq_indice, const char *nome_arq_titulo, string entrada);
 };
 
 #endif // GERADOR_ARQUIVOS_H_

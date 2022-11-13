@@ -6,6 +6,9 @@
 
 using namespace std;
 
+/**
+ * Classe para ler e escrever em arquivo.
+*/
 class Manipulador
 {
     public:
