@@ -19,7 +19,7 @@ GeradorArquivos::GeradorArquivos(vector<bool>& campos)
  * que contém 1 registro por linha, ler todos os registros do arquivo
  * e gerar um novo arquivo, denominado arquivo_dados,
  * que contém os mesmos registros com o seu tamanho escrito antes.
- * 
+ *
  * Nessa etapa, apenas os seguintes campos pré-definidos serão inclusos:
  *   show_id
  *   type
@@ -75,10 +75,7 @@ bool GeradorArquivos::criar_arquivo_dados(const char *nome_arq_entrada, const ch
 		// Se algum registro for lido com tamanho 0, passa para o próximo
 		// Idealmente isso só ocorrerá no final do arquivo
 		// Mas também ajuda com problemas de leitura de linhas vazias no meio do arquivo
-		if (registro.size() <= 0)
-        {
-            continue;
-        }
+		if (registro.size() <= 0) continue;
 
 		quantidade_registros++;
 
@@ -117,13 +114,12 @@ bool GeradorArquivos::criar_arquivo_dados(const char *nome_arq_entrada, const ch
 /**
  * Função com objetivo de criar o arquivo de índices direto.
  * O arquivo começa com um cabeçalho indicando quantos registros guarda.
- * Cada registro tem tamanho fixo, e dois campos: {id, posição_arquivo_dados} 
+ * Cada registro tem tamanho fixo, e dois campos: {id, posição_arquivo_dados}
 */
 bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_dados, const char *nome_arq_indice_primario)
 {
     ifstream arquivo_dados;
     ofstream arquivo_indice_primario;
-    Manipulador manipulador;
 
     /**
     * registro: string que recebe o registro lido do arquivo de dados
@@ -158,21 +154,21 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_dados, 
 	}
 
     // Lê-se a quantidade de registros do arquivo de dados
-    quantidade_registros = manipulador.ler_inteiro(arquivo_dados);
+    quantidade_registros = Manipulador::ler_inteiro(arquivo_dados);
     byte_atual += sizeof(int);
 
     // Escreve-se a quantidade de registros no arquivo de índices
-    manipulador.escrever_inteiro(arquivo_indice_primario, quantidade_registros);
+    Manipulador::escrever_inteiro(arquivo_indice_primario, quantidade_registros);
 
     while(arquivo_dados.eof() == false)
     {
-        // Lê-se um registro do arquivo de dados
-        registro = manipulador.ler_registro(arquivo_dados);
+		// Lê-se um registro do arquivo de dados
+        registro = Manipulador::ler_registro(arquivo_dados);
 
 		// Caso haja alguma linha vazia, pula ela
         if (registro.size() <= 0)
         {
-            continue;
+			continue;
         }
 
         // Converte o registro lido (string) para TituloNetflix
@@ -189,7 +185,7 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_dados, 
         strcpy(rI.id, tN.id);
         rI.bytes_do_inicio = byte_atual;
 
-        manipulador.escrever_dados(arquivo_indice_primario, (void *) &rI, (int) sizeof(rI));
+        Manipulador::escrever_dados(arquivo_indice_primario, (void *) &rI, (int) sizeof(rI));
 
         // Atualiza o byte_atual para pular a quantidade de bytes lida do arquivo de dados
         // `sizeof(int)` que é o inteiro indicador do tamanho do registro
@@ -210,12 +206,10 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_dados, 
 /**
  * Função que tem como objetivo criar um arquivo de índices indiretos.
  * O arquivo começa com um cabeçalho indicando quantos registros guarda.
- * Cada registro tem tamanho fixo, e dois campos: {titulo, id} 
+ * Cada registro tem tamanho fixo, e dois campos: {titulo, id}
 */
 bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_dados, const char *nome_arq_titulo)
 {
-	Manipulador manipulador;
-
 	ifstream arquivo_dados;
 	ofstream arquivo_titulo;
 
@@ -228,12 +222,12 @@ bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_dados, const cha
 	int quantidade_registros;
 
 	// Escreve a quantidade de registros no cabeçalho do arquivo de títulos
-	quantidade_registros = manipulador.ler_inteiro(arquivo_dados);
+	quantidade_registros = Manipulador::ler_inteiro(arquivo_dados);
 	arquivo_titulo.write((char *) &quantidade_registros, sizeof(quantidade_registros));
 
 	while(arquivo_dados.eof()==false)
 	{
-		registro = manipulador.ler_registro(arquivo_dados);
+		registro = Manipulador::ler_registro(arquivo_dados);
 
 		if (registro.size() <= 0) continue;
 
@@ -254,7 +248,7 @@ bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_dados, const cha
 		strcpy(rT.titulo, tN.titulo);
 		strcpy(rT.id, tN.id);
 
-		manipulador.escrever_dados(arquivo_titulo, (void *) &rT, (int) sizeof(rT));
+		Manipulador::escrever_dados(arquivo_titulo, (void *) &rT, (int) sizeof(rT));
 	}
 
 	arquivo_dados.close();

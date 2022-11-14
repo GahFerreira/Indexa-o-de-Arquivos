@@ -3,6 +3,7 @@
 #include "Manipulador.h"
 #include "TituloNetflix.h"
 #include "GeradorArquivos.h"
+#include "GerenciadorRegistros.h"
 
 #define ARQUIVO_ENTRADA "netflix_titles.csv"
 #define ARQUIVO_DADOS "arquivo_dados.txt"
@@ -42,7 +43,6 @@ int main()
 	campos[ANO_LANCAMENTO_ID] = true;
 
     GeradorArquivos geradorArquivos(campos);
-    Manipulador manipulador;
 
     // INÍCIO CRIAÇÃO DOS ARQUIVOS
 
@@ -54,7 +54,7 @@ int main()
 
     if (geradorArquivos.criar_arquivo_dados(ARQUIVO_ENTRADA, ARQUIVO_DADOS))
     {
-        cout << "Leitura do arquivo de entrada e criacao do novo arquivo bem sucedidos\n";
+        cout << "Leitura do arquivo de entrada e criacao do arquivo de dados bem sucedidos\n";
     }
 
     else
@@ -65,7 +65,6 @@ int main()
     }
 
     // ARQUIVO ÍNDICE DIRETO (ID -> POSIÇÃO)
-
     if (geradorArquivos.criar_arquivo_indice_primario(ARQUIVO_DADOS, ARQUIVO_INDICE))
     {
         cout << "Criacao do arquivo indice bem sucedido\n";
@@ -107,12 +106,12 @@ int main()
 
     arquivo_dados.open(ARQUIVO_DADOS, ios_base::in | ios_base::binary);
 
-    estatistica.quantidade_registros = manipulador.ler_inteiro(arquivo_dados);
+    estatistica.quantidade_registros = Manipulador::ler_inteiro(arquivo_dados);
     pos_atual += sizeof(int);
 
     for (int i = 0; i < estatistica.quantidade_registros; i++)
     {
-        string registro = manipulador.ler_registro(arquivo_dados);
+        string registro = Manipulador::ler_registro(arquivo_dados);
 
         if ((int) registro.size() < estatistica.tamanho_menor)
         {
@@ -147,10 +146,9 @@ int main()
 	arquivo_indice.open(ARQUIVO_INDICE, ios_base::in | ios_base::binary);
 	arquivo_titulo.open(ARQUIVO_TITULO, ios_base::in | ios_base::binary);
 
+    GerenciadorRegistros gerenciador_registros(ARQUIVO_INDICE, ARQUIVO_TITULO, Manipulador::ler_inteiro(arquivo_dados), campos);
     string escolha, entrada;
-    int numero, quantidade_registros;
-
-    quantidade_registros = manipulador.ler_inteiro(arquivo_dados);
+    int numero_escolha;
 
     while (true)
     {
@@ -163,7 +161,7 @@ int main()
         << "Digite " << ESTATISTICA << " para ver as estatisticas do arquivo de dados." << endl
         << "Digite " << FINALIZAR << " para encerrar o programa." << endl
         << endl
-        << "Digite o numero desejado: ";
+        << "Digite o numero_escolha desejado: ";
 
         while (escolha.size() <= 0)
         {
@@ -173,12 +171,12 @@ int main()
         try
         {
             // Tenta converter a `escolha` em um número
-            numero = stoi(escolha);
+            numero_escolha = stoi(escolha);
 
-            if (numero != ESCOLHA_ID and
-                numero != ESCOLHA_TITULO and
-                numero != ESTATISTICA and
-                numero != FINALIZAR) throw exception();
+            if (numero_escolha != ESCOLHA_ID and
+                numero_escolha != ESCOLHA_TITULO and
+                numero_escolha != ESTATISTICA and
+                numero_escolha != FINALIZAR) throw exception();
         }
 
         catch(const std::exception& e)
@@ -189,62 +187,31 @@ int main()
         }
 
 
-
-        if (numero == ESCOLHA_ID)
+        if (numero_escolha == ESCOLHA_ID)
         {
-            cout << endl << "Voce escolheu ID." << endl << "Digite o ID: ";
+            cout << endl << "Voce escolheu ID." << endl << "Digite o ID (ex: s" << rand()%7788 << "): ";
 
             while (entrada.size() <= 0)
             {
                 getline(cin, entrada);
             }
 
-            // Transforma a string em minúscula
-            for (auto& caractere : entrada)
-            {
-                caractere = tolower(caractere);
-            }
-
-            // Salta o cabeçalho
-            arquivo_indice.seekg(sizeof(int), ios_base::beg);
-
-            RegistroIndice registrosIndice[quantidade_registros];
-
-            // Leitura de todo o conteúdo do arquivo de índices direto de uma só vez
-            manipulador.ler_dados(arquivo_indice, quantidade_registros * sizeof(RegistroIndice), &registrosIndice[0]);
-
-            vector<TituloNetflix> respostas;
-
-            for (int i = 0; i < quantidade_registros; i++)
-            {
-                // Encontrou par
-                if (string(registrosIndice[i].id).find(entrada) != string::npos)
-                {
-                    arquivo_dados.seekg(registrosIndice[i].bytes_do_inicio, ios_base::beg);
-
-                    string registro = manipulador.ler_registro(arquivo_dados);
-
-                    respostas.push_back(TituloNetflix(registro, campos));
-                }
-            }
-
             cout << endl;
 
-            if (respostas.size() <= 0) cout << "Nao foi encontrado registro com esse parametro." << endl << endl;
+            int resposta_em_bytes_do_inicio = gerenciador_registros.busca_id(arquivo_dados, arquivo_indice, entrada);
+
+            if (resposta_em_bytes_do_inicio == -1) cout << "Nao foi encontrado registro com esse parametro." << endl << endl;
+
+            else if (resposta_em_bytes_do_inicio == -2) cout << "Entrada invalida." << endl << endl;
 
             else
             {
-                cout << "RESULTADO: " << respostas.size() << " resultado(s) encontrado(s)." << endl;
-
-                for (int i = 0; i < (int) respostas.size(); i++)
-                {
-                    respostas[i].print(campos);
-                    cout << endl;
-                }
+                cout << "RESULTADO: " << endl;
+                gerenciador_registros.localizar_titulo_netflix_arquivo_dados(arquivo_dados, resposta_em_bytes_do_inicio).print(campos);
             }
         }
 
-        else if (numero == ESCOLHA_TITULO)
+        else if (numero_escolha == ESCOLHA_TITULO)
         {
             cout << endl << "Voce escolheu TITULO." << endl << "Digite o TITULO: ";
 
@@ -263,26 +230,26 @@ int main()
             arquivo_indice.seekg(sizeof(int), ios_base::beg);
             arquivo_titulo.seekg(sizeof(int), ios_base::beg);
 
-            RegistroIndice registrosIndice[quantidade_registros];
+            RegistroIndice registrosIndice[gerenciador_registros.quantidade_registros];
 
             // Leitura de todo o conteúdo do arquivo de índices direto de uma só vez
-            manipulador.ler_dados(arquivo_indice, quantidade_registros * sizeof(RegistroIndice), &registrosIndice[0]);
+            Manipulador::ler_dados(arquivo_indice, gerenciador_registros.quantidade_registros * sizeof(RegistroIndice), &registrosIndice[0]);
 
-            RegistroTitulo registrosTitulo[quantidade_registros];
+            RegistroTitulo registrosTitulo[gerenciador_registros.quantidade_registros];
 
             // Leitura de todo o conteúdo do arquivo de índices indireto de uma só vez
-            manipulador.ler_dados(arquivo_titulo, quantidade_registros * (int) sizeof(RegistroTitulo), &registrosTitulo[0]);
+            Manipulador::ler_dados(arquivo_titulo, gerenciador_registros.quantidade_registros * (int) sizeof(RegistroTitulo), &registrosTitulo[0]);
 
             vector<TituloNetflix> respostas;
 
-            for (int i = 0; i < quantidade_registros; i++)
+            for (int i = 0; i < gerenciador_registros.quantidade_registros; i++)
             {
                 // Encontrou um titulo no arquivo de titulos que pareou com a entrada
                 if (string(registrosTitulo[i].titulo).find(entrada) != string::npos)
                 {
                     // Procura dentro dos registros do arquivo de índices primários
                     // pelo id do par encontrado
-                    for (int j = 0; j < quantidade_registros; j++)
+                    for (int j = 0; j < gerenciador_registros.quantidade_registros; j++)
                     {
                         // Uma vez encontrado o id no arquivo de índices direto
                         // adiciona o TituloNetflix a respostas
@@ -292,7 +259,7 @@ int main()
                             // do registro pareado
                             arquivo_dados.seekg(registrosIndice[j].bytes_do_inicio, ios_base::beg);
 
-                            string registro = manipulador.ler_registro(arquivo_dados);
+                            string registro = Manipulador::ler_registro(arquivo_dados);
 
                             respostas.push_back(TituloNetflix(registro, campos));
 
@@ -318,7 +285,7 @@ int main()
             }
         }
 
-        else if (numero == ESTATISTICA)
+        else if (numero_escolha == ESTATISTICA)
         {
             cout
                 << "ESTATISTICAS:" << endl
@@ -332,7 +299,7 @@ int main()
                 << '\t' << "Tamanho: " << estatistica.tamanho_maior << endl
                 << '\t';
 
-            TituloNetflix(manipulador.ler_registro(arquivo_dados), campos).print(campos);
+            TituloNetflix(Manipulador::ler_registro(arquivo_dados), campos).print(campos);
 
             cout << endl;
 
@@ -343,7 +310,7 @@ int main()
                 << '\t' << "Tamanho: " << estatistica.tamanho_menor << endl
                 << '\t';
 
-            TituloNetflix(manipulador.ler_registro(arquivo_dados), campos).print(campos);
+            TituloNetflix(Manipulador::ler_registro(arquivo_dados), campos).print(campos);
 
             cout << endl;
         }

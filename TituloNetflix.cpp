@@ -210,3 +210,9 @@ void TituloNetflix::print(vector<bool>& campos) const
         }
     }
 }
+
+// Converte o id para string e retorna a parte numérica do id.
+int TituloNetflix::id_para_inteiro(string _id)
+{
+    return stoi(string(_id).substr(1));
+}

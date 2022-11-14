@@ -65,6 +65,7 @@ class TituloNetflix
 
         void print(vector<bool>& campos) const;
         void string_para_titulo_netflix(string registro, vector<bool>& campos);
+        static int id_para_inteiro(string _id);
 };
 
 #endif // TITULO_NETFLIX_H_

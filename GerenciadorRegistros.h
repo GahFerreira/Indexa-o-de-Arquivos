@@ -13,11 +13,14 @@
 class GerenciadorRegistros
 {
     public:
-        const string nome_arquivo_indice, nome_arquivo_titulo;
+        string nome_arquivo_indice, nome_arquivo_titulo;
+        int quantidade_registros;
+        vector<bool> campos;
 
-        GerenciadorRegistros(string nome_arquivo_indice, string nome_arquivo_titulo);
+        GerenciadorRegistros(string nome_arquivo_indice, string nome_arquivo_titulo, int quantidade_registros, vector<bool> campos);
 
-        TituloNetflix busca_id(ifstream& arquivo_dados, ifstream& arquivo_indice, string id_registro);
+        TituloNetflix localizar_titulo_netflix_arquivo_dados(ifstream& arquivo_dados, int bytes_do_inicio);
+        int busca_id(ifstream& arquivo_dados, ifstream& arquivo_indice, string id_registro);
         vector<TituloNetflix> busca_titulo(ifstream& arquivo_dados, ifstream& arquivo_indice, ifstream& arquivo_titulo, string titulo_registro);
         void inserir_registro(ofstream& arquivo_dados, ifstream& arquivo_indice, TituloNetflix tN);
         bool deletar_registro(ofstream& arquivo_dados, ofstream& arquivo_indice, ofstream& arquivo_titulo, string id_registro);
