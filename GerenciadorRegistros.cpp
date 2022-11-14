@@ -23,6 +23,8 @@ TituloNetflix GerenciadorRegistros::localizar_registro_arquivo_dados(ifstream& a
 
 /**
  * Busca o `id_buscado` através da busca binária no arquivo de índices primário.
+ * Retorna a posição no arquivo de dados do registro procurado, ou -1 se não achar
+ * registro correspondente.
 */
 int GerenciadorRegistros::busca_id(ifstream& arquivo_indice, string id_buscado)
 {
@@ -32,12 +34,7 @@ int GerenciadorRegistros::busca_id(ifstream& arquivo_indice, string id_buscado)
         caractere = tolower(caractere);
     }
 
-    // Entrada inválida
-    if (id_buscado.front() != 's') return -2;
-    for (int i = 1; i < (int) id_buscado.size(); i++)
-    {
-        if (id_buscado[i] < '0' or id_buscado[i] > '9') return -2;
-    }
+    if (id_eh_valido(id_buscado) == false) return -2;
 
     // Guardará todo o conteúdo do arquivo em memória
     RegistroIndice registros_indice[quantidade_registros];
@@ -86,9 +83,22 @@ vector<string> GerenciadorRegistros::busca_titulo(ifstream& arquivo_titulo, stri
     return respostas;
 }
 
+bool GerenciadorRegistros::id_eh_valido(string id)
+{
+    // Entrada inválida
+    if (id.front() != 's' or id.size() < 2) return false;
+    for (int i = 1; i < (int) id.size(); i++)
+    {
+        if (id[i] < '0' or id[i] > '9') return false;
+    }
+
+    return true;
+}
+
 int GerenciadorRegistros::busca_binaria_id_para_bytes_do_inicio(RegistroIndice registros_indice[], string id_buscado)
 {
     int ini = 0, fim = quantidade_registros-1, mid;
+
     int id_buscado_inteiro = TituloNetflix::id_para_inteiro(id_buscado);
 
     while (ini <= fim)
@@ -144,4 +154,96 @@ vector<int> GerenciadorRegistros::lista_de_ids_para_lista_de_posicoes(ifstream& 
     }
 
     return respostas;
+}
+
+void GerenciadorRegistros::ordenar_arquivo_indice(fstream& arquivo_indice)
+{
+    // Lê todos os registros do arquivo de índices primário
+    arquivo_indice.seekg(0, ios_base::beg);
+
+    int quantidade_registros_arquivo_indice = Manipulador::ler_inteiro((ifstream&) arquivo_indice);
+
+    RegistroIndice registros_indice[quantidade_registros_arquivo_indice];
+
+    Manipulador::ler_dados((ifstream&) arquivo_indice, sizeof(RegistroIndice) * quantidade_registros_arquivo_indice, &registros_indice[0]);
+
+    // Ordena os registros válidos (não inclui os marcados como excluídos)
+    sort(registros_indice, registros_indice + quantidade_registros_arquivo_indice,
+        [](RegistroIndice rI_1, RegistroIndice rI_2)
+        {
+            // O registro excluído sempre vai pro final
+            if (rI_1.id[0] == '*') return false;
+            if (rI_2.id[0] == '*') return true;
+
+            return TituloNetflix::id_para_inteiro(rI_1.id) < TituloNetflix::id_para_inteiro(rI_2.id);
+        }
+    );
+
+    // Conta quantos registros foram excluídos e retira essa quantidade
+    // da quantidade total de registros.
+    for (int i = quantidade_registros_arquivo_indice-1; i >= 0; i--)
+    {
+        if (registros_indice[i].id[0] == '*') quantidade_registros_arquivo_indice--;
+
+        else break;
+    }
+
+    arquivo_indice.seekp(0, ios_base::beg);
+
+    // Escreve os dados atualizados sobre os antigos
+    Manipulador::escrever_inteiro((ofstream&) arquivo_indice, quantidade_registros_arquivo_indice);
+
+    Manipulador::escrever_dados((ofstream&) arquivo_indice, registros_indice, sizeof(RegistroIndice) * quantidade_registros_arquivo_indice);
+}
+
+void GerenciadorRegistros::inserir_registro_final(ofstream& arquivo_dados, fstream& arquivo_indice, ofstream& arquivo_titulo, TituloNetflix tN)
+{
+    quantidade_registros++;
+
+    // Inserção final do arquivo de dados
+    arquivo_dados.seekp(0, ios_base::end);
+
+    int posicao_arquivo_dados = arquivo_dados.tellp();
+
+    string registro = tN.to_string(campos);
+
+    int tamanho_registro = (int) registro.size();
+
+    arquivo_dados.write((const char *) &tamanho_registro, sizeof(tamanho_registro));
+
+    arquivo_dados.write((const char *) registro.c_str(), tamanho_registro);
+
+    // Cabeçalho
+    arquivo_dados.seekp(0, ios_base::beg);
+    Manipulador::escrever_inteiro(arquivo_dados, quantidade_registros);
+
+
+    // Atualização arquivo índice primário
+    RegistroIndice registro_indice;
+    strcpy(registro_indice.id, tN.id);
+    registro_indice.bytes_do_inicio = posicao_arquivo_dados;
+
+    arquivo_indice.seekp(0, ios_base::end);
+
+    Manipulador::escrever_dados((ofstream&) arquivo_indice, &registro_indice, sizeof(RegistroIndice));
+
+    // Cabeçalho
+    arquivo_indice.seekp(0, ios_base::beg);
+    Manipulador::escrever_inteiro((ofstream&) arquivo_indice, quantidade_registros);
+
+    // Reordenação
+    ordenar_arquivo_indice(arquivo_indice);
+
+    // Atualização arquivo título
+    RegistroTitulo registro_titulo;
+    strcpy(registro_titulo.titulo, tN.titulo);
+    strcpy(registro_titulo.id, tN.id);
+
+    arquivo_titulo.seekp(0, ios_base::end);
+
+    Manipulador::escrever_dados(arquivo_titulo, &registro_titulo, sizeof(RegistroTitulo));
+
+    // Cabeçalho
+    arquivo_titulo.seekp(0, ios_base::beg);
+    Manipulador::escrever_inteiro(arquivo_titulo, quantidade_registros);
 }

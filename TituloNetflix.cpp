@@ -18,9 +18,9 @@ string Lista::to_string() const
 }
 
 /**
- * Transforma uma string, com conteúdo de um registro TituloNetflix 
+ * Transforma uma string, com conteúdo de um registro TituloNetflix
  * em um objeto TituloNetflix.
- * 
+ *
  * A string possui os campos definidos em `campos`.
  * Se `campos` possui todos os campos, isso representa que todos os campos estão presentes.
 */
@@ -59,7 +59,18 @@ void TituloNetflix::string_para_titulo_netflix(string registro, vector<bool>& ca
                 case 4: this->elenco.lista.push_back(campo); break;
                 case 5: this->pais.lista.push_back(campo); break;
                 case 6: strcpy(this->data, campo.c_str()); break;
-                case 7: this->ano_lancamento = (short) stoi(campo); break;
+                case 7: 
+                {
+                    try
+                    {
+                        this->ano_lancamento = (short) stoi(campo);
+                    }
+                    catch(const std::exception& e)
+                    {
+                        std::cerr << e.what() << '\n';
+                    }
+                    break;
+                }
                 case 8: strcpy(this->avaliacao, campo.c_str()); break;
                 case 9: strcpy(this->duracao, campo.c_str()); break;
                 case 10: this->listado_em.lista.push_back(campo); break;
@@ -89,7 +100,18 @@ void TituloNetflix::string_para_titulo_netflix(string registro, vector<bool>& ca
                 case 4: this->elenco.lista.push_back(campo); break;
                 case 5: this->pais.lista.push_back(campo); break;
                 case 6: strcpy(this->data, campo.c_str()); break;
-                case 7: this->ano_lancamento = (short) stoi(campo); break;
+                case 7:
+                {
+                    try
+                    {
+                        this->ano_lancamento = (short) stoi(campo);
+                    }
+                    catch(const std::exception& e)
+                    {
+                        std::cerr << e.what() << '\n';
+                    }
+                    break;
+                }
                 case 8: strcpy(this->avaliacao, campo.c_str()); break;
                 case 9: strcpy(this->duracao, campo.c_str()); break;
                 case 10: this->listado_em.lista.push_back(campo); break;
@@ -211,8 +233,47 @@ void TituloNetflix::print(vector<bool>& campos) const
     }
 }
 
+// Converte um TituloNetflix para uma string.
+string TituloNetflix::to_string(vector<bool>& campos) const
+{
+    string resposta;
+
+    for (int i_campo = 0; i_campo < QTD_CAMPOS; i_campo++)
+    {
+        if (campos[i_campo] == true)
+        {
+            switch(i_campo)
+            {
+                case ID_ID: resposta += id + ';'; break;
+                case TIPO_ID: resposta += tipo + ';'; break;
+                case TITULO_ID: resposta += titulo + ';'; break;
+                case DIRETOR_ID: resposta += diretor.to_string() + ';'; break;
+                case ELENCO_ID: resposta += elenco.to_string() + ';'; break;
+                case PAIS_ID: resposta += pais.to_string() + ';'; break;
+                case DATA_ID: resposta += data + ';'; break;
+                case ANO_LANCAMENTO_ID: resposta += ano_lancamento + ';'; break;
+                case AVALIACAO_ID: resposta += avaliacao + ';'; break;
+                case DURACAO_ID: resposta += duracao + ';'; break;
+                case LISTADO_EM_ID: resposta += listado_em.to_string() + ';'; break;
+                case DESCRICAO_ID: resposta += descricao + ';'; break;
+            }
+        }
+    }
+
+    return resposta;
+}
+
 // Converte o id para string e retorna a parte numérica do id.
 int TituloNetflix::id_para_inteiro(string _id)
 {
-    return stoi(string(_id).substr(1));
+    try
+    {
+        return stoi(string(_id).substr(1));
+    }
+    catch (std::exception e)
+    {
+        cerr << "Erro: Conversão de id para inteiro invalida.";
+
+        return -1;
+    }
 }

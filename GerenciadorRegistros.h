@@ -2,6 +2,7 @@
 #define GERENCIADOR_REGISTROS_H_
 
 #include <cstdio> // `rename` e `delete` para arquivos
+#include <algorithm> // `sort`
 #include <string>
 #include <vector>
 #include "TituloNetflix.h"
@@ -25,13 +26,18 @@ class GerenciadorRegistros
 
         // Métodos auxiliares para busca
         TituloNetflix localizar_registro_arquivo_dados(ifstream& arquivo_dados, int bytes_do_inicio);
+        bool id_eh_valido(string id);
         int busca_binaria_id_para_bytes_do_inicio(RegistroIndice registros_indice[], string id_buscado);
         vector<int> lista_de_ids_para_lista_de_posicoes(ifstream& arquivo_indice, vector<string> ids);
 
-
-        void inserir_registro(ofstream& arquivo_dados, ifstream& arquivo_indice, TituloNetflix tN);
+        // Inserção e deleção
+        void inserir_registro_final(ofstream& arquivo_dados, fstream& arquivo_indice, ofstream& arquivo_titulo, TituloNetflix tN);
         bool deletar_registro(ofstream& arquivo_dados, ofstream& arquivo_indice, ofstream& arquivo_titulo, string id_registro);
         vector<string> deletar_multiplos_registros(ofstream& arquivo_dados, ofstream& arquivo_indice, ofstream& arquivo_titulo, vector<string> id_regitros);
+
+        // Métodos auxiliares para inserção e deleção
+        void ordenar_arquivo_indice(fstream& arquivo_indice);
+        void atualizar_quantidade_de_registros(ofstream& arquivo_dados, ofstream& arquivo_indice, ofstream& arquivo_titulo, int variacao);
 };
 
 #endif

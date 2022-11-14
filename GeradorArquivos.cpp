@@ -37,7 +37,7 @@ bool GeradorArquivos::criar_arquivo_dados(const char *nome_arq_entrada, const ch
 	string registro;
 	int tamanho_registro, quantidade_registros = 0;
 
-	arquivo_entrada.open(nome_arq_entrada, ios_base::in);
+	arquivo_entrada.open(nome_arq_entrada, ios_base::in | ios_base::binary);
 	arquivo_dados.open(nome_arq_dados, ios_base::out | ios_base::binary);
 
 	// Checa a abertura dos arquivos
@@ -75,7 +75,7 @@ bool GeradorArquivos::criar_arquivo_dados(const char *nome_arq_entrada, const ch
 		// Se algum registro for lido com tamanho 0, passa para o próximo
 		// Idealmente isso só ocorrerá no final do arquivo
 		// Mas também ajuda com problemas de leitura de linhas vazias no meio do arquivo
-		if (registro.size() <= 0) continue;
+		if (registro.empty()) continue;
 
 		quantidade_registros++;
 
@@ -166,7 +166,7 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_dados, 
         registro = Manipulador::ler_registro(arquivo_dados);
 
 		// Caso haja alguma linha vazia, pula ela
-        if (registro.size() <= 0)
+        if (registro.empty())
         {
 			continue;
         }
@@ -185,7 +185,7 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_dados, 
         strcpy(rI.id, tN.id);
         rI.bytes_do_inicio = byte_atual;
 
-        Manipulador::escrever_dados(arquivo_indice_primario, (void *) &rI, (int) sizeof(rI));
+        Manipulador::escrever_dados(arquivo_indice_primario, (void *) &rI, sizeof(rI));
 
         // Atualiza o byte_atual para pular a quantidade de bytes lida do arquivo de dados
         // `sizeof(int)` que é o inteiro indicador do tamanho do registro
@@ -229,7 +229,7 @@ bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_dados, const cha
 	{
 		registro = Manipulador::ler_registro(arquivo_dados);
 
-		if (registro.size() <= 0) continue;
+		if (registro.empty()) continue;
 
 		TituloNetflix tN(registro, campos_a_serem_usados);
 

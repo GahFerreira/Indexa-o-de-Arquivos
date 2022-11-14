@@ -107,7 +107,7 @@ bool Manipulador::escrever_inteiro(ofstream& arquivo, int inteiro)
 */
 bool Manipulador::escrever_string(ofstream& arquivo, string str)
 {
-	if (str.size() <= 0)
+	if (str.empty())
 	{
 		cout << "Aviso: Escrita de string de tamanho 0 ou invalido." << endl;
 		return false;
