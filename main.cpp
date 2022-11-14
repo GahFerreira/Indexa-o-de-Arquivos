@@ -671,7 +671,7 @@ int main()
             cout << "REGISTRO A SER ADICIONADO:\n";
             tN.print(campos);
 
-            gerenciador_registros.inserir_registro_final((ofstream&) arquivo_dados, (fstream&) arquivo_indice, (ofstream&) arquivo_titulo, tN);
+            gerenciador_registros.inserir_registro_final((ofstream&) arquivo_dados, (fstream&) arquivo_indice, arquivo_titulo, tN);
         }
 
         else if (numero_escolha == DELETAR_REGISTRO)

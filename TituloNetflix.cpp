@@ -46,6 +46,16 @@ void TituloNetflix::string_para_titulo_netflix(string registro, vector<bool>& ca
     // `auto` será substituindo por um iterador de string.
     for (auto i = registro.begin(); ; i++)
     {
+        // Caso a string passada para a conversão tenha mais caracteres que o esperado
+        // a iteração é do `for` é finalizada assim que todos os campos definidos são
+        // devidamente alocados.
+        if (id_campo_atual >= (int) campos_registro.size())
+        {
+            cout << "Aviso: conversao de string para TituloNetflix com sucesso, mas possivelmente com campos a mais no final." << endl;
+
+            break;
+        }
+
         // Ao atingir o fim do registro, é necessário atribuir o valor da string `campo` a um campo de TituloNetflix.
         // Posteriormente, encerra-se o for.
         if (i == registro.end())
@@ -75,13 +85,6 @@ void TituloNetflix::string_para_titulo_netflix(string registro, vector<bool>& ca
                 case 9: strcpy(this->duracao, campo.c_str()); break;
                 case 10: this->listado_em.lista.push_back(campo); break;
                 case 11: strcpy(this->descricao, campo.c_str()); break;
-            }
-
-            if (campos_registro[id_campo_atual] != campos_registro.back())
-            {
-                cout << "Aviso: TituloNetflix criado a partir de string com campos faltando: " << endl;
-
-                this->print(campos);
             }
 
             break;

@@ -18,6 +18,8 @@ TituloNetflix GerenciadorRegistros::localizar_registro_arquivo_dados(ifstream& a
 
     string registro = Manipulador::ler_registro(arquivo_dados);
 
+    cout << "PoneiRegistro: " << registro << endl;
+
     return TituloNetflix(registro, campos);
 }
 
@@ -61,17 +63,18 @@ vector<string> GerenciadorRegistros::busca_titulo(ifstream& arquivo_titulo, stri
         caractere = tolower(caractere);
     }
 
-    RegistroTitulo registros_titulo[quantidade_registros];
+    // Lê o cabeçalho
+    arquivo_titulo.seekg(0, ios_base::beg);
+    int quantidade_registros_titulo = Manipulador::ler_inteiro(arquivo_titulo);
 
-    // Salta o cabeçalho
-    arquivo_titulo.seekg(sizeof(int), ios_base::beg);
+    RegistroTitulo registros_titulo[quantidade_registros_titulo];
 
     // Leitura de todo o conteúdo do arquivo de índices indireto de uma só vez
-    Manipulador::ler_dados(arquivo_titulo, quantidade_registros * (int) sizeof(RegistroTitulo), &registros_titulo[0]);
+    Manipulador::ler_dados(arquivo_titulo, quantidade_registros_titulo * (int) sizeof(RegistroTitulo), &registros_titulo[0]);
 
     vector<string> respostas;
 
-    for (int i = 0; i < quantidade_registros; i++)
+    for (int i = 0; i < quantidade_registros_titulo; i++)
     {
         // Encontrou um titulo no arquivo de titulos que pareou com a entrada e não foi deletado
         if (registros_titulo[i].id[0] != '*' and
@@ -183,6 +186,8 @@ void GerenciadorRegistros::ordenar_arquivo_indice(fstream& arquivo_indice)
 
     int quantidade_registros_arquivo_indice = Manipulador::ler_inteiro((ifstream&) arquivo_indice);
 
+    cout << "PONEI qtd_reg_arq_ind: " << quantidade_registros_arquivo_indice << endl;
+
     RegistroIndice registros_indice[quantidade_registros_arquivo_indice];
 
     Manipulador::ler_dados((ifstream&) arquivo_indice, sizeof(RegistroIndice) * quantidade_registros_arquivo_indice, &registros_indice[0]);
@@ -199,6 +204,16 @@ void GerenciadorRegistros::ordenar_arquivo_indice(fstream& arquivo_indice)
         }
     );
 
+    for (int i = 0; i < 10; i++)
+    {
+        cout << registros_indice[i].id << " " << registros_indice[i].bytes_do_inicio << "\n";
+    }
+
+    for (int i = quantidade_registros_arquivo_indice-1; i>= quantidade_registros_arquivo_indice-1-10; i--)
+    {
+        cout << registros_indice[i].id << " " << registros_indice[i].bytes_do_inicio << "\n";    
+    }
+
     // Conta quantos registros foram excluídos e retira essa quantidade
     // da quantidade total de registros.
     for (int i = quantidade_registros_arquivo_indice-1; i >= 0; i--)
@@ -213,14 +228,14 @@ void GerenciadorRegistros::ordenar_arquivo_indice(fstream& arquivo_indice)
     // Escreve os dados atualizados sobre os antigos
     Manipulador::escrever_inteiro((ofstream&) arquivo_indice, quantidade_registros_arquivo_indice);
 
-    Manipulador::escrever_dados((ofstream&) arquivo_indice, registros_indice, sizeof(RegistroIndice) * quantidade_registros_arquivo_indice);
+    Manipulador::escrever_dados((ofstream&) arquivo_indice, (void *) registros_indice, sizeof(RegistroIndice) * quantidade_registros_arquivo_indice);
 }
 
 /**
  * Função que recebe um registro e o insere no final do arquivo de dados.
  * Além disso, faz todas as modificações adequadas aos arquivos.
 */
-void GerenciadorRegistros::inserir_registro_final(ofstream& arquivo_dados, fstream& arquivo_indice, ofstream& arquivo_titulo, TituloNetflix tN)
+void GerenciadorRegistros::inserir_registro_final(ofstream& arquivo_dados, fstream& arquivo_indice, fstream& arquivo_titulo, TituloNetflix tN)
 {
     quantidade_registros++;
 
@@ -245,33 +260,43 @@ void GerenciadorRegistros::inserir_registro_final(ofstream& arquivo_dados, fstre
 
 
     // Atualização arquivo índice primário
-    RegistroIndice registro_indice;
-    strcpy(registro_indice.id, tN.id);
-    registro_indice.bytes_do_inicio = posicao_arquivo_dados;
+    // Primeiro, obtem o número de registros salvos no arquivo (igual a quantidade_registros, idealmente)
+    arquivo_indice.seekg(0, ios_base::beg);
+    int qtd_registros_indice = Manipulador::ler_inteiro((ifstream&) arquivo_dados);
+    
+    RegistroIndice registro_indice[1];
+    strcpy(registro_indice[0].id, tN.id);
+    registro_indice[0].bytes_do_inicio = posicao_arquivo_dados;
 
-    arquivo_indice.seekp(0, ios_base::end);
+    // Vai pra primeira posição após o último registro válido
+    arquivo_indice.seekp(sizeof(int) + (qtd_registros_indice * sizeof(RegistroIndice)), ios_base::beg);
+    Manipulador::escrever_dados((ofstream&) arquivo_indice, (void *) registro_indice, sizeof(RegistroIndice));
 
-    Manipulador::escrever_dados((ofstream&) arquivo_indice, &registro_indice, sizeof(RegistroIndice));
-
-    // Cabeçalho
+    // Atualiza o cabeçalho
     arquivo_indice.seekp(0, ios_base::beg);
     Manipulador::escrever_inteiro((ofstream&) arquivo_indice, quantidade_registros);
+
+    cout << "QTD REAL REGISTROS PONEI: " << quantidade_registros << endl;
 
     // Reordenação
     ordenar_arquivo_indice(arquivo_indice);
 
+
     // Atualização arquivo título
-    RegistroTitulo registro_titulo;
-    strcpy(registro_titulo.titulo, tN.titulo);
-    strcpy(registro_titulo.id, tN.id);
+    RegistroTitulo registro_titulo[1];
+    strcpy(registro_titulo[0].titulo, tN.titulo);
+    strcpy(registro_titulo[0].id, tN.id);
 
     arquivo_titulo.seekp(0, ios_base::end);
 
-    Manipulador::escrever_dados(arquivo_titulo, &registro_titulo, sizeof(RegistroTitulo));
+    Manipulador::escrever_dados((ofstream&) arquivo_titulo, (void *) registro_titulo, sizeof(RegistroTitulo));
 
     // Cabeçalho
+    arquivo_titulo.seekg(0, ios_base::beg);
+    int quantidade_registros_titulo = Manipulador::ler_inteiro((ifstream&) arquivo_titulo);
+
     arquivo_titulo.seekp(0, ios_base::beg);
-    Manipulador::escrever_inteiro(arquivo_titulo, quantidade_registros);
+    Manipulador::escrever_inteiro((ofstream&) arquivo_titulo, ++quantidade_registros_titulo);
 }
 
 bool GerenciadorRegistros::deletar_registro(ofstream& arquivo_dados, fstream& arquivo_indice, fstream& arquivo_titulo, string id_registro)
@@ -299,7 +324,7 @@ bool GerenciadorRegistros::deletar_registro(ofstream& arquivo_dados, fstream& ar
 
     arquivo_indice.seekp(pos_registro_arquivo_indices, ios_base::beg);
 
-    Manipulador::escrever_dados((ofstream&) arquivo_indice, &asterisco, sizeof(char));
+    Manipulador::escrever_dados((ofstream&) arquivo_indice, (void *) &asterisco, sizeof(char));
 
     // Cabeçalho
     arquivo_indice.seekp(0, ios_base::beg);
@@ -313,7 +338,7 @@ bool GerenciadorRegistros::deletar_registro(ofstream& arquivo_dados, fstream& ar
     // Move-se para a posição onde fica o 's' do id do registro.
     arquivo_dados.seekp(pos_registro_arquivo_dados + sizeof(int), ios_base::beg);
 
-    Manipulador::escrever_dados(arquivo_dados, &asterisco, sizeof(char));
+    Manipulador::escrever_dados(arquivo_dados, (void *) &asterisco, sizeof(char));
 
     // Cabeçalho
     arquivo_dados.seekp(0, ios_base::beg);
@@ -336,7 +361,7 @@ bool GerenciadorRegistros::deletar_registro(ofstream& arquivo_dados, fstream& ar
             // Move-se para a posição onde fica o 's' do id do registro.
             arquivo_titulo.seekp(sizeof(int) + (i * sizeof(RegistroTitulo)) + TAM_TITULO+1);
 
-            Manipulador::escrever_dados((ofstream&) arquivo_titulo, &asterisco, sizeof(char));
+            Manipulador::escrever_dados((ofstream&) arquivo_titulo, (void *) &asterisco, sizeof(char));
 
             break;
         }

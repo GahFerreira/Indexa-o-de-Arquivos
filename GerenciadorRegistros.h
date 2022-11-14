@@ -35,7 +35,7 @@ class GerenciadorRegistros
         vector<int> lista_de_ids_para_lista_de_posicoes(ifstream& arquivo_indice, vector<string> ids);
 
         // Inserção e deleção
-        void inserir_registro_final(ofstream& arquivo_dados, fstream& arquivo_indice, ofstream& arquivo_titulo, TituloNetflix tN);
+        void inserir_registro_final(ofstream& arquivo_dados, fstream& arquivo_indice, fstream& arquivo_titulo, TituloNetflix tN);
         bool deletar_registro(ofstream& arquivo_dados, fstream& arquivo_indice, fstream& arquivo_titulo, string id_registro);
         vector<string> deletar_multiplos_registros(ofstream& arquivo_dados, ofstream& arquivo_indice, ofstream& arquivo_titulo, vector<string> id_regitros);
 
