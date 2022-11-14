@@ -9,6 +9,7 @@
 #define ARQUIVO_DADOS "arquivo_dados.txt"
 #define ARQUIVO_INDICE "arquivo_indice.txt"
 #define ARQUIVO_TITULO "arquivo_titulo.txt"
+#define ARQUIVO_REINSERCAO_DADOS "arquivo_reinsercao_dados.txt"
 
 #define INF 1 << 30 // INFINITO
 
@@ -35,7 +36,7 @@ int main()
 {
     // INÍCIO PROGRAMA
 
-    cout << "Inicio do Programa\n\n";
+    cout << "Inicio do Programa.\n\n";
 
     vector<bool> campos(QTD_CAMPOS, false);
     campos[ID_ID] = true;
@@ -50,18 +51,18 @@ int main()
 
     cout
         << "Arquivo de entrada: " << ARQUIVO_ENTRADA << endl
-        << "Lendo arquivo de entrada e gerando arquivo de dados" << endl;
+        << "Lendo arquivo de entrada e gerando arquivo de dados." << endl;
 
     // ARQUIVO DADOS
 
     if (geradorArquivos.criar_arquivo_dados(ARQUIVO_ENTRADA, ARQUIVO_DADOS))
     {
-        cout << "Leitura do arquivo de entrada e criacao do arquivo de dados bem sucedidos\n";
+        cout << "Leitura do arquivo de entrada e criacao do arquivo de dados bem sucedidos.\n";
     }
 
     else
     {
-        cout << "Erro na leitura do arquivo de entrada ou criacao do novo arquivo\n";
+        cout << "Erro na leitura do arquivo de entrada ou criacao do novo arquivo.\n";
 
         return -1;
     }
@@ -69,12 +70,12 @@ int main()
     // ARQUIVO ÍNDICE DIRETO (ID -> POSIÇÃO)
     if (geradorArquivos.criar_arquivo_indice_primario(ARQUIVO_DADOS, ARQUIVO_INDICE))
     {
-        cout << "Criacao do arquivo indice bem sucedido\n";
+        cout << "Criacao do arquivo indice bem sucedido.\n";
     }
 
     else
     {
-        cout << "Erro na criacao do arquivo de indice\n";
+        cout << "Erro na criacao do arquivo de indice.\n";
 
         return -1;
     }
@@ -83,17 +84,29 @@ int main()
 
     if (geradorArquivos.criar_arquivo_titulo(ARQUIVO_DADOS, ARQUIVO_TITULO))
     {
-        cout << "Criacao do arquivo titulo bem sucedido\n";
+        cout << "Criacao do arquivo titulo bem sucedido.\n";
     }
 
     else
     {
-        cout << "Erro na criacao do arquivo titulo\n";
+        cout << "Erro na criacao do arquivo titulo.\n";
 
         return -1;
     }
 
-    cout << endl;
+    // ARQUIVO REINSERÇÃO DE REGISTROS NO ARQUIVO DE DADOS
+
+    if (geradorArquivos.criar_arquivo_reinsercao_dados(ARQUIVO_REINSERCAO_DADOS))
+    {
+        cout << "Criacao do arquivo de reinsercao de dados bem sucedido.\n";
+    }
+
+    else
+    {
+        cout << "Erro na criacao do arquivo de reinsercao de dados.\n";
+
+        return -1;
+    }
 
     // INÍCIO GERAÇÃO ESTATISTICA
 
@@ -135,12 +148,12 @@ int main()
 
     estatistica.tamanho_medio_registro /= (double) estatistica.quantidade_registros;
 
-    cout << "Estatisticas geradas." << endl;
+    cout << "Estatisticas geradas.\n\n";
 
     arquivo_dados.close();
 
     // INÍCIO DA BUSCA
-    GerenciadorRegistros gerenciador_registros(ARQUIVO_DADOS, ARQUIVO_INDICE, ARQUIVO_TITULO, estatistica.quantidade_registros, campos);
+    GerenciadorRegistros gerenciador_registros(ARQUIVO_DADOS, ARQUIVO_INDICE, ARQUIVO_TITULO, ARQUIVO_REINSERCAO_DADOS, estatistica.quantidade_registros, campos);
 
     gerenciador_registros.abrir_fstreams();
 
@@ -155,7 +168,7 @@ int main()
         << "Digite " << BUSCAR_POR_ID << " para buscar um registro pelo SHOW_ID." << endl
         << "Digite " << BUSCAR_POR_TITULO << " para buscar um registro pelo TITULO." << endl
         << "Digite " << INSERIR_REGISTRO << " para inserir um novo registro." << endl
-        << "Digite " << DELETAR_REGISTRO << " para deletar um registro." << endl
+        << "Digite " << DELETAR_REGISTRO << " para deletar um registro pelo SHOW_ID." << endl
         << "Digite " << ESTATISTICA << " para ver as estatisticas do arquivo de dados." << endl
         << "Digite " << FINALIZAR << " para encerrar o programa." << endl
         << endl
@@ -241,6 +254,13 @@ int main()
             {
                 // Se encontrou, mostra os registros na tela.
                 vector<int> respostas = gerenciador_registros.lista_de_ids_para_lista_de_posicoes(ids);
+
+                cout << "Ponei\n";
+                for (int i = 0; i < (int) ids.size(); i++)
+                {
+                    cout << ids[i] << " ";
+                }
+                cout << endl;
 
                 cout << "RESULTADO: " << respostas.size() << " resultado(s) encontrado(s)." << endl;
 
@@ -666,7 +686,7 @@ int main()
             cout << "REGISTRO A SER ADICIONADO:\n";
             tN.print(campos);
 
-            gerenciador_registros.inserir_registro_final(tN);
+            gerenciador_registros.inserir_registro_inteligente(tN);
         }
 
         else if (numero_escolha == DELETAR_REGISTRO)

@@ -18,12 +18,12 @@
 class GerenciadorRegistros
 {
     public:
-        string nome_arquivo_dados, nome_arquivo_indice, nome_arquivo_titulo;
-        fstream arquivo_dados, arquivo_indice, arquivo_titulo;
+        string nome_arquivo_dados, nome_arquivo_indice, nome_arquivo_titulo, nome_arquivo_reinsercao_dados;
+        fstream arquivo_dados, arquivo_indice, arquivo_titulo, arquivo_reinsercao_dados;
         int quantidade_registros;
         vector<bool> campos;
 
-        GerenciadorRegistros(string nome_arquivo_dados, string nome_arquivo_indice, string nome_arquivo_titulo, int quantidade_registros, vector<bool> campos);
+        GerenciadorRegistros(string nome_arquivo_dados, string nome_arquivo_indice, string nome_arquivo_titulo, string nome_arquivo_reinsercao_dados, int quantidade_registros, vector<bool> campos);
 
         // Abrir & fechar fstreams
         void abrir_fstreams();
@@ -36,18 +36,19 @@ class GerenciadorRegistros
         // Métodos auxiliares para busca
         TituloNetflix localizar_registro_arquivo_dados(int bytes_do_inicio);
         bool id_eh_valido(string id);
-        int busca_binaria_id_para_bytes_do_inicio(RegistroIndice registros_indice[], string id_buscado);
+        int busca_binaria_id_para_bytes_do_inicio(RegistroIndice registros_indice[], int quantidade_registros_indice, string id_buscado);
         vector<int> lista_de_ids_para_lista_de_posicoes(vector<string> ids);
 
         // Inserção e deleção
         void inserir_registro_final(TituloNetflix tN);
+        void inserir_registro_inteligente(TituloNetflix tN);
         bool deletar_registro(string id_registro);
         vector<string> deletar_multiplos_registros(vector<string> id_regitros);
 
         // Métodos auxiliares para inserção e deleção
         void ordenar_arquivo_indice();
-        void atualizar_quantidade_de_registros(int variacao);
-        pair<int, int> busca_binaria_para_posicoes_nos_arquivos(RegistroIndice registros_indice[], string id_buscado);
+        void ordenar_arquivo_reinsercao();
+        pair<int, int> busca_binaria_para_posicoes_nos_arquivos(RegistroIndice registros_indice[], int quantidade_registros_indice, string id_buscado);
 };
 
 #endif

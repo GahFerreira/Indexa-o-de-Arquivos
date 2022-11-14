@@ -1,5 +1,55 @@
 #include "Manipulador.h"
 
+bool Manipulador::checar_integridade_leitura(ifstream& arquivo)
+{
+	bool resposta = true;
+
+	if (arquivo.fail() == true)
+	{
+		cout << "Operacao de leitura ativou bit fail.\n";
+		resposta = false;
+	}
+
+	if (arquivo.bad() == true)
+	{
+		cout << "Operacao de leitura ativou bit bad.\n";
+		resposta = false;
+	}
+
+	if (arquivo.eof() == true)
+	{
+		cout << "Operacao de leitura ativou bit eof.\n";
+		resposta = false;
+	}
+
+	return resposta;
+}
+
+bool Manipulador::checar_integridade_escrita(ofstream& arquivo)
+{
+	bool resposta = true;
+
+	if (arquivo.fail() == true)
+	{
+		cout << "Operacao de escrita ativou bit fail.\n";
+		resposta = false;
+	}
+
+	if (arquivo.bad() == true)
+	{
+		cout << "Operacao de escrita ativou bit bad.\n";
+		resposta = false;
+	}
+
+	if (arquivo.eof() == true)
+	{
+		cout << "Operacao de escrita ativou bit eof.\n";
+		resposta = false;
+	}
+
+	return resposta;
+}
+
 /**
 * Lê e retorna um inteiro de `arquivo`.
 *
@@ -19,6 +69,11 @@ int Manipulador::ler_inteiro(ifstream& arquivo)
 		cerr << "Falha na leitura de inteiro do arquivo.\n";
 	}
 
+	if (checar_integridade_leitura(arquivo) == false)
+	{
+		cout << "[ERRO] Operacao: Leitura de Inteiro.\n";
+	}
+	
 	return inteiro;
 }
 
@@ -59,6 +114,11 @@ string Manipulador::ler_registro(ifstream& arquivo)
 
     delete[] registro;
 
+	if (checar_integridade_leitura(arquivo) == false)
+	{
+		cout << "[ERRO] Operacao: Leitura de Registro.\n";
+	}
+	
 	return registro_retorno;
 }
 
@@ -82,6 +142,11 @@ void Manipulador::ler_dados(ifstream& arquivo, int tamanho, void *destino)
 	{
 		cerr << "Falha na tentativa de leitura de dados de tamanho " << tamanho << "." << endl;
 	}
+
+	if (checar_integridade_leitura(arquivo) == false)
+	{
+		cout << "[ERRO] Operacao: Leitura de Dados.\n";
+	}
 }
 
 /**
@@ -97,6 +162,11 @@ bool Manipulador::escrever_inteiro(ofstream& arquivo, int inteiro)
 	{
 		cerr << "Erro: Falha na escrita do inteiro: " << inteiro << endl;
 		return false;
+	}
+
+	if (checar_integridade_escrita(arquivo) == false)
+	{
+		cout << "[ERRO] Operacao: Escrita de Inteiro.\n";
 	}
 
     return true;
@@ -121,6 +191,11 @@ bool Manipulador::escrever_string(ofstream& arquivo, string str)
 	{
 		cerr << "Erro: Falha na escrita da string: " + str << endl;
 		return false;
+	}
+
+	if (checar_integridade_escrita(arquivo) == false)
+	{
+		cout << "[ERRO] Operacao: Escrita de String.\n";
 	}
 
 	return true;
@@ -153,6 +228,11 @@ bool Manipulador::escrever_string(ofstream& arquivo, string str, int tamanho)
 		return false;
 	}
 
+	if (checar_integridade_escrita(arquivo) == false)
+	{
+		cout << "[ERRO] Operacao: Escrita de String.\n";
+	}
+
 	return true;
 }
 
@@ -176,6 +256,11 @@ bool Manipulador::escrever_dados(ofstream& arquivo, void *dados, int tamanho)
 	{
 		cout << "Erro: Falha na escrita de dados de tamanho " << tamanho << "." << endl;
 		return false;
+	}
+
+	if (checar_integridade_escrita(arquivo) == false)
+	{
+		cout << "[ERRO] Operacao: Escrita de Dados.\n";
 	}
 
 	return true;

@@ -27,6 +27,13 @@ struct RegistroTitulo
     char quebra_linha = '\n';
 };
 
+struct RegistroReinsercaoDados
+{
+    int bytes_do_inicio;
+    int quantidade_bytes;
+    char quebra_linha = '\n';
+};
+
 /**
  * Classe para gerar os arquivos de dados e de indexação. 
 */
@@ -41,6 +48,7 @@ class GeradorArquivos
         bool criar_arquivo_dados(const char *nome_arq_entrada, const char *nome_arq_dados);
         bool criar_arquivo_indice_primario(const char *nome_arq_dados, const char *nome_arq_indice_primario);
         bool criar_arquivo_titulo(const char *nome_arq_dados, const char *nome_arq_titulo);
+        bool criar_arquivo_reinsercao_dados(const char *nome_arq_reinsercao_dados);
 };
 
 #endif // GERADOR_ARQUIVOS_H_

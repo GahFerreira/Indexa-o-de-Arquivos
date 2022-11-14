@@ -118,7 +118,7 @@ bool GeradorArquivos::criar_arquivo_dados(const char *nome_arq_entrada, const ch
 */
 bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_dados, const char *nome_arq_indice_primario)
 {
-    ifstream arquivo_dados;
+	ifstream arquivo_dados;
     ofstream arquivo_indice_primario;
 
     /**
@@ -160,14 +160,25 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_dados, 
     // Escreve-se a quantidade de registros no arquivo de índices
     Manipulador::escrever_inteiro(arquivo_indice_primario, quantidade_registros);
 
-    while(arquivo_dados.eof() == false)
+    for (int i = 0; i < quantidade_registros; i++)
     {
+		if(arquivo_dados.eof() == true)
+		{
+			cout 
+				<< "Aviso: Bit EOF ativado durante criacao do arquivo de indices primario. "
+				<< "Quantidade de registros lido: " << i << " registro(s).\n";
+			break;
+		}
+
 		// Lê-se um registro do arquivo de dados
         registro = Manipulador::ler_registro(arquivo_dados);
 
-		// Caso haja alguma linha vazia, pula ela
+		// Caso haja alguma linha vazia, pula ela.
+		// Idealmente não há, por isso o aviso.
         if (registro.empty())
         {
+			cout << "Aviso: Registro vazio lido durante criacao do arquivo de indices primario.\n";
+
 			continue;
         }
 
@@ -216,7 +227,7 @@ bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_dados, const cha
 	arquivo_dados.open(nome_arq_dados,ios::in | ios::binary);
 	arquivo_titulo.open(nome_arq_titulo,ios::out | ios::binary);
 
-	if(arquivo_dados.good()==false || arquivo_titulo.good()==false){return false;}
+	if (arquivo_dados.good() == false || arquivo_titulo.good() == false) { return false; }
 
 	string registro;
 	int quantidade_registros;
@@ -225,8 +236,16 @@ bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_dados, const cha
 	quantidade_registros = Manipulador::ler_inteiro(arquivo_dados);
 	arquivo_titulo.write((char *) &quantidade_registros, sizeof(quantidade_registros));
 
-	while(arquivo_dados.eof()==false)
-	{
+	for (int i = 0; i < quantidade_registros; i++)
+    {
+		if(arquivo_dados.eof() == true)
+		{
+			cout 
+				<< "Aviso: Bit EOF ativado durante criacao do arquivo de titulos. "
+				<< "Quantidade de registros lido: " << i << " registro(s).\n";
+			break;
+		}
+
 		registro = Manipulador::ler_registro(arquivo_dados);
 
 		if (registro.empty()) continue;
@@ -255,6 +274,25 @@ bool GeradorArquivos::criar_arquivo_titulo(const char *nome_arq_dados, const cha
 	arquivo_titulo.close();
 
 	if (arquivo_dados.bad() or arquivo_titulo.bad()) return false;
+
+	return true;
+}
+
+bool GeradorArquivos::criar_arquivo_reinsercao_dados(const char *nome_arq_reinsercao_dados)
+{
+	fstream arquivo_reinsercao_dados;
+
+	arquivo_reinsercao_dados.open(nome_arq_reinsercao_dados, ios::out | ios::binary);
+
+	if(arquivo_reinsercao_dados.good()==false) { return false; }
+
+	int quantidade_registros = 0;
+
+	Manipulador::escrever_inteiro((ofstream&) arquivo_reinsercao_dados, quantidade_registros);
+
+	arquivo_reinsercao_dados.close();
+
+	if (arquivo_reinsercao_dados.bad()) return false;
 
 	return true;
 }

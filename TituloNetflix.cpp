@@ -263,7 +263,7 @@ string TituloNetflix::to_string(vector<bool>& campos)
         }
     }
 
-    return resposta;
+    return resposta.substr(0, resposta.size() - 1);
 }
 
 // Converte o id para string e retorna a parte numérica do id.
@@ -275,7 +275,7 @@ int TituloNetflix::id_para_inteiro(string _id)
     }
     catch (std::exception e)
     {
-        cerr << "Erro: Conversão de id para inteiro invalida.";
+        cerr << "Erro: Conversao de id para inteiro invalida, para id: " << _id << ".\n";
 
         return -1;
     }
