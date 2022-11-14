@@ -74,6 +74,8 @@ vector<string> GerenciadorRegistros::busca_titulo(ifstream& arquivo_titulo, stri
 
     vector<string> respostas;
 
+    cout << "Qtd_reg_tit: " << quantidade_registros_titulo << endl;
+
     for (int i = 0; i < quantidade_registros_titulo; i++)
     {
         // Encontrou um titulo no arquivo de titulos que pareou com a entrada e não foi deletado
@@ -283,20 +285,27 @@ void GerenciadorRegistros::inserir_registro_final(ofstream& arquivo_dados, fstre
 
 
     // Atualização arquivo título
+    arquivo_titulo.seekg(0, ios_base::beg);
+    int qtd_registros_titulo = Manipulador::ler_inteiro((ifstream&) arquivo_titulo);
+
+    // Transforma o título para apenas letras minúsculas
+    for (int i = 0; i < TAM_TITULO+1 and tN.titulo[i] != '\0'; i++)
+    {
+        tN.titulo[i] = tolower(tN.titulo[i]);
+    }
+
     RegistroTitulo registro_titulo[1];
     strcpy(registro_titulo[0].titulo, tN.titulo);
     strcpy(registro_titulo[0].id, tN.id);
 
-    arquivo_titulo.seekp(0, ios_base::end);
+    // Vai pra primeira posição após o último registro válido
+    arquivo_titulo.seekp(sizeof(int) + (qtd_registros_titulo * sizeof(RegistroTitulo)), ios_base::beg);
 
     Manipulador::escrever_dados((ofstream&) arquivo_titulo, (void *) registro_titulo, sizeof(RegistroTitulo));
 
-    // Cabeçalho
-    arquivo_titulo.seekg(0, ios_base::beg);
-    int quantidade_registros_titulo = Manipulador::ler_inteiro((ifstream&) arquivo_titulo);
-
+    // Atualiza o cabeçalho
     arquivo_titulo.seekp(0, ios_base::beg);
-    Manipulador::escrever_inteiro((ofstream&) arquivo_titulo, ++quantidade_registros_titulo);
+    Manipulador::escrever_inteiro((ofstream&) arquivo_titulo, qtd_registros_titulo+1);
 }
 
 bool GerenciadorRegistros::deletar_registro(ofstream& arquivo_dados, fstream& arquivo_indice, fstream& arquivo_titulo, string id_registro)
