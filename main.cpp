@@ -674,6 +674,32 @@ int main()
             gerenciador_registros.inserir_registro_final((ofstream&) arquivo_dados, (fstream&) arquivo_indice, (ofstream&) arquivo_titulo, tN);
         }
 
+        else if (numero_escolha == DELETAR_REGISTRO)
+        {
+            cout 
+                << "Voce escolheu DELETAR REGISTRO." << endl
+                << "Digite o ID do registro a ser deletado (ex: s" << rand()%7788 << "): ";
+
+            string entrada_id, entrada_confirmar;
+
+            while (entrada_id.empty())
+            {
+                getline(cin, entrada_id);
+            }
+
+            bool resposta = gerenciador_registros.deletar_registro((ofstream&) arquivo_dados, arquivo_indice, arquivo_titulo, entrada_id);
+
+            if (resposta == false)
+            {
+                cout << "RESULTADO: Registro com id definido nao encontrado para delecao.\n\n";
+            }
+
+            else
+            {
+                cout << "RESULTADO: Registro com id: " << entrada_id << " deletado.\n\n";
+            }
+        }
+
         else if (numero_escolha == ESTATISTICA)
         {
             cout

@@ -234,7 +234,7 @@ void TituloNetflix::print(vector<bool>& campos) const
 }
 
 // Converte um TituloNetflix para uma string.
-string TituloNetflix::to_string(vector<bool>& campos) const
+string TituloNetflix::to_string(vector<bool>& campos)
 {
     string resposta;
 
@@ -244,18 +244,18 @@ string TituloNetflix::to_string(vector<bool>& campos) const
         {
             switch(i_campo)
             {
-                case ID_ID: resposta += id + ';'; break;
-                case TIPO_ID: resposta += tipo + ';'; break;
-                case TITULO_ID: resposta += titulo + ';'; break;
+                case ID_ID: resposta += string(id) + ';'; break;
+                case TIPO_ID: resposta += string(tipo) + ';'; break;
+                case TITULO_ID: resposta += string(titulo) + ';'; break;
                 case DIRETOR_ID: resposta += diretor.to_string() + ';'; break;
                 case ELENCO_ID: resposta += elenco.to_string() + ';'; break;
                 case PAIS_ID: resposta += pais.to_string() + ';'; break;
-                case DATA_ID: resposta += data + ';'; break;
-                case ANO_LANCAMENTO_ID: resposta += ano_lancamento + ';'; break;
-                case AVALIACAO_ID: resposta += avaliacao + ';'; break;
-                case DURACAO_ID: resposta += duracao + ';'; break;
+                case DATA_ID: resposta += string(data) + ';'; break;
+                case ANO_LANCAMENTO_ID: resposta += std::to_string(ano_lancamento) + ';'; break;
+                case AVALIACAO_ID: resposta += string(avaliacao) + ';'; break;
+                case DURACAO_ID: resposta += string(duracao) + ';'; break;
                 case LISTADO_EM_ID: resposta += listado_em.to_string() + ';'; break;
-                case DESCRICAO_ID: resposta += descricao + ';'; break;
+                case DESCRICAO_ID: resposta += string(descricao) + ';'; break;
             }
         }
     }

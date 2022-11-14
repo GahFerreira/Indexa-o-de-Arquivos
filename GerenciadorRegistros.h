@@ -3,10 +3,14 @@
 
 #include <cstdio> // `rename` e `delete` para arquivos
 #include <algorithm> // `sort`
+#include <tuple> // `tie`
 #include <string>
 #include <vector>
 #include "TituloNetflix.h"
 #include "GeradorArquivos.h"
+
+#define NAO_ENCONTROU -1
+#define ID_INVALIDO -2
 
 /**
  * Classe para operações de busca, inserção e deleção de registros.
@@ -32,12 +36,13 @@ class GerenciadorRegistros
 
         // Inserção e deleção
         void inserir_registro_final(ofstream& arquivo_dados, fstream& arquivo_indice, ofstream& arquivo_titulo, TituloNetflix tN);
-        bool deletar_registro(ofstream& arquivo_dados, ofstream& arquivo_indice, ofstream& arquivo_titulo, string id_registro);
+        bool deletar_registro(ofstream& arquivo_dados, fstream& arquivo_indice, fstream& arquivo_titulo, string id_registro);
         vector<string> deletar_multiplos_registros(ofstream& arquivo_dados, ofstream& arquivo_indice, ofstream& arquivo_titulo, vector<string> id_regitros);
 
         // Métodos auxiliares para inserção e deleção
         void ordenar_arquivo_indice(fstream& arquivo_indice);
         void atualizar_quantidade_de_registros(ofstream& arquivo_dados, ofstream& arquivo_indice, ofstream& arquivo_titulo, int variacao);
+        pair<int, int> busca_binaria_para_posicoes_nos_arquivos(RegistroIndice registros_indice[], string id_buscado);
 };
 
 #endif
