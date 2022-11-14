@@ -198,7 +198,7 @@ int main()
 
             cout << endl;
 
-            int resposta_em_bytes_do_inicio = gerenciador_registros.busca_id(arquivo_dados, arquivo_indice, entrada);
+            int resposta_em_bytes_do_inicio = gerenciador_registros.busca_id(arquivo_indice, entrada);
 
             if (resposta_em_bytes_do_inicio == -1) cout << "Nao foi encontrado registro com esse parametro." << endl << endl;
 
@@ -207,7 +207,7 @@ int main()
             else
             {
                 cout << "RESULTADO: " << endl;
-                gerenciador_registros.localizar_titulo_netflix_arquivo_dados(arquivo_dados, resposta_em_bytes_do_inicio).print(campos);
+                gerenciador_registros.localizar_registro_arquivo_dados(arquivo_dados, resposta_em_bytes_do_inicio).print(campos);
             }
         }
 
@@ -220,66 +220,25 @@ int main()
                 getline(cin, entrada);
             }
 
-            // Transforma a string em minúscula
-            for (auto& caractere : entrada)
-            {
-                caractere = tolower(caractere);
-            }
-
-            // Salta o cabeçalho
-            arquivo_indice.seekg(sizeof(int), ios_base::beg);
-            arquivo_titulo.seekg(sizeof(int), ios_base::beg);
-
-            RegistroIndice registrosIndice[gerenciador_registros.quantidade_registros];
-
-            // Leitura de todo o conteúdo do arquivo de índices direto de uma só vez
-            Manipulador::ler_dados(arquivo_indice, gerenciador_registros.quantidade_registros * sizeof(RegistroIndice), &registrosIndice[0]);
-
-            RegistroTitulo registrosTitulo[gerenciador_registros.quantidade_registros];
-
-            // Leitura de todo o conteúdo do arquivo de índices indireto de uma só vez
-            Manipulador::ler_dados(arquivo_titulo, gerenciador_registros.quantidade_registros * (int) sizeof(RegistroTitulo), &registrosTitulo[0]);
-
-            vector<TituloNetflix> respostas;
-
-            for (int i = 0; i < gerenciador_registros.quantidade_registros; i++)
-            {
-                // Encontrou um titulo no arquivo de titulos que pareou com a entrada
-                if (string(registrosTitulo[i].titulo).find(entrada) != string::npos)
-                {
-                    // Procura dentro dos registros do arquivo de índices primários
-                    // pelo id do par encontrado
-                    for (int j = 0; j < gerenciador_registros.quantidade_registros; j++)
-                    {
-                        // Uma vez encontrado o id no arquivo de índices direto
-                        // adiciona o TituloNetflix a respostas
-                        if (string(registrosTitulo[i].id) == string(registrosIndice[j].id))
-                        {
-                            // Posiciona a leitura no arquivo de dados na posição
-                            // do registro pareado
-                            arquivo_dados.seekg(registrosIndice[j].bytes_do_inicio, ios_base::beg);
-
-                            string registro = Manipulador::ler_registro(arquivo_dados);
-
-                            respostas.push_back(TituloNetflix(registro, campos));
-
-                            break;
-                        }
-                    }
-                }
-            }
+            // Retorna os ids dos registros que tem `entrada` como substring de seu título.
+            vector<string> ids = gerenciador_registros.busca_titulo(arquivo_titulo, entrada);
 
             cout << endl;
 
-            if (respostas.size() <= 0) cout << "Nao foi encontrado registro com esse parametro" << endl << endl;
+            // Se não encontrou nenhum, não faz nada.
+            if (ids.empty() == true) cout << "Nao foi encontrado registro com esse parametro" << endl << endl;
 
             else
             {
+                // Se encontrou, mostra os registros na tela.
+                vector<int> respostas = gerenciador_registros.lista_de_ids_para_lista_de_posicoes(arquivo_indice, ids);
+
                 cout << "RESULTADO: " << respostas.size() << " resultado(s) encontrado(s)." << endl;
 
                 for (int i = 0; i < (int) respostas.size(); i++)
                 {
-                    respostas[i].print(campos);
+                    gerenciador_registros.localizar_registro_arquivo_dados(arquivo_dados, respostas[i]).print(campos);
+                    
                     cout << endl;
                 }
             }
