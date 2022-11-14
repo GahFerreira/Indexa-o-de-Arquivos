@@ -140,15 +140,10 @@ int main()
     arquivo_dados.close();
 
     // INÍCIO DA BUSCA
+    GerenciadorRegistros gerenciador_registros(ARQUIVO_DADOS, ARQUIVO_INDICE, ARQUIVO_TITULO, estatistica.quantidade_registros, campos);
 
-    // `arquivo_dados` já foi declarado anteriormente
-    fstream arquivo_indice, arquivo_titulo;
+    gerenciador_registros.abrir_fstreams();
 
-    arquivo_dados.open(ARQUIVO_DADOS, ios_base::in | ios_base::binary | ios_base::out);
-	arquivo_indice.open(ARQUIVO_INDICE, ios_base::in | ios_base::binary | ios_base::out);
-	arquivo_titulo.open(ARQUIVO_TITULO, ios_base::in | ios_base::binary | ios_base::out);
-
-    GerenciadorRegistros gerenciador_registros(ARQUIVO_INDICE, ARQUIVO_TITULO, Manipulador::ler_inteiro((ifstream&) arquivo_dados), campos);
     string escolha;
     int numero_escolha;
 
@@ -210,7 +205,7 @@ int main()
 
             cout << endl;
 
-            int resposta_em_bytes_do_inicio = gerenciador_registros.busca_id((ifstream&)arquivo_indice, entrada_id);
+            int resposta_em_bytes_do_inicio = gerenciador_registros.busca_id(entrada_id);
 
             if (resposta_em_bytes_do_inicio == -1) cout << "Nao foi encontrado registro com esse parametro." << endl << endl;
 
@@ -219,7 +214,7 @@ int main()
             else
             {
                 cout << "RESULTADO: " << endl;
-                gerenciador_registros.localizar_registro_arquivo_dados((ifstream&) arquivo_dados, resposta_em_bytes_do_inicio).print(campos);
+                gerenciador_registros.localizar_registro_arquivo_dados(resposta_em_bytes_do_inicio).print(campos);
             }
         }
 
@@ -235,7 +230,7 @@ int main()
             }
 
             // Retorna os ids dos registros que tem `entrada` como substring de seu título.
-            vector<string> ids = gerenciador_registros.busca_titulo((ifstream&) arquivo_titulo, entrada_titulo);
+            vector<string> ids = gerenciador_registros.busca_titulo(entrada_titulo);
 
             cout << endl;
 
@@ -245,13 +240,13 @@ int main()
             else
             {
                 // Se encontrou, mostra os registros na tela.
-                vector<int> respostas = gerenciador_registros.lista_de_ids_para_lista_de_posicoes((ifstream&) arquivo_indice, ids);
+                vector<int> respostas = gerenciador_registros.lista_de_ids_para_lista_de_posicoes(ids);
 
                 cout << "RESULTADO: " << respostas.size() << " resultado(s) encontrado(s)." << endl;
 
                 for (int i = 0; i < (int) respostas.size(); i++)
                 {
-                    gerenciador_registros.localizar_registro_arquivo_dados((ifstream&)arquivo_dados, respostas[i]).print(campos);
+                    gerenciador_registros.localizar_registro_arquivo_dados(respostas[i]).print(campos);
 
                     cout << endl;
                 }
@@ -290,7 +285,7 @@ int main()
                                     entrada_id.clear();
                                 }
 
-                                else if (gerenciador_registros.busca_id((ifstream&) arquivo_indice, entrada_id) != -1)
+                                else if (gerenciador_registros.busca_id(entrada_id) != -1)
                                 {
                                     cout << "\tID ja existente. Tente novamente.\n";
                                     entrada_id.clear();
@@ -671,7 +666,7 @@ int main()
             cout << "REGISTRO A SER ADICIONADO:\n";
             tN.print(campos);
 
-            gerenciador_registros.inserir_registro_final((ofstream&) arquivo_dados, (fstream&) arquivo_indice, arquivo_titulo, tN);
+            gerenciador_registros.inserir_registro_final(tN);
         }
 
         else if (numero_escolha == DELETAR_REGISTRO)
@@ -687,7 +682,7 @@ int main()
                 getline(cin, entrada_id);
             }
 
-            bool resposta = gerenciador_registros.deletar_registro((ofstream&) arquivo_dados, arquivo_indice, arquivo_titulo, entrada_id);
+            bool resposta = gerenciador_registros.deletar_registro(entrada_id);
 
             if (resposta == false)
             {
@@ -738,9 +733,7 @@ int main()
         }
     }
 
-    arquivo_dados.close();
-    arquivo_indice.close();
-    arquivo_titulo.close();
+    gerenciador_registros.fechar_fstreams();
 
     return 0;
 }
