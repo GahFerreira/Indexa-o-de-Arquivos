@@ -1,25 +1,23 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -pedantic-errors -std=c++17
+CXXFLAGS = -Wall -Wextra -std=c++17 -c
 
-all: main
+all: main.o Estatistica.o GeradorArquivos.o GerenciadorRegistros.o Manipulador.o TituloNetflix.o
+	g++ main.o Estatistica.o GeradorArquivos.o GerenciadorRegistros.o Manipulador.o TituloNetflix.o -o ProjetoPratico.exe
 
-main: main.o
-	$(CXX) $(CXXFLAGS) -o main.exe main.o
-
-main.o: manipulador.o tituloNetflix.o geradorArquivos.o gerenciadorRegistros.o estatistica.o
+main.o: main.cpp
 	$(CXX) $(CXXFLAGS) main.cpp
 
-manipulador.o:
-	$(CXX) $(CXXFLAGS) Manipulador.cpp Manipulador.h
+Estatistica.o: Estatistica.cpp Estatistica.h
+	$(CXX) $(CXXFLAGS) Estatistica.cpp
 
-tituloNetflix.o:
-	$(CXX) $(CXXFLAGS) TituloNetflix.cpp TituloNetflix.h
+GeradorArquivos.o: GeradorArquivos.cpp GeradorArquivos.h
+	$(CXX) $(CXXFLAGS) GeradorArquivos.cpp
 
-geradorArquivos.o:
-	$(CXX) $(CXXFLAGS) GeradorArquivos.cpp GeradorArquivos.h
+GerenciadorRegistros.o: GerenciadorRegistros.cpp GerenciadorRegistros.h
+	$(CXX) $(CXXFLAGS) GerenciadorRegistros.cpp
 
-gerenciadorRegistros.o:
-	$(CXX) $(CXXFLAGS) GerenciadorRegistros.cpp GerenciadorRegistros.h
+Manipulador.o: Manipulador.cpp Manipulador.h
+	$(CXX) $(CXXFLAGS) Manipulador.cpp
 
-estatistica.o:
-	$(CXX) $(CXXFLAGS) Estatistica.cpp Estatistica.h
+TituloNetflix.o: TituloNetflix.cpp TituloNetflix.h
+	$(CXX) $(CXXFLAGS) TituloNetflix.cpp
