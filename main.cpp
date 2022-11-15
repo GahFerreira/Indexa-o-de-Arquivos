@@ -420,6 +420,8 @@ int main()
                                         }
 
                                         qtd = stoi(entrada_qtd_paises);
+
+                                        if (qtd > 193 or qtd < 0) throw exception();
                                     }
                                     catch(const std::exception& e)
                                     {

@@ -43,7 +43,6 @@ class GerenciadorRegistros
         void inserir_registro_final(TituloNetflix tN);
         void inserir_registro_inteligente(TituloNetflix tN);
         bool deletar_registro(string id_registro);
-        vector<string> deletar_multiplos_registros(vector<string> id_regitros);
 
         // Métodos auxiliares para inserção e deleção
         void ordenar_arquivo_indice();

@@ -5,6 +5,8 @@
 */
 string Lista::to_string() const
 {
+    if (lista.empty() == true) return "";
+
     string resultado;
 
     resultado += lista[0];
