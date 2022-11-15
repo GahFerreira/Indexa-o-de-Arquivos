@@ -121,8 +121,6 @@ int main()
 
         gerenciador_registros.abrir_fstreams();
 
-        cout << "Ponei: qtd_reg_ind: " << Manipulador::ler_inteiro((ifstream&) gerenciador_registros.arquivo_indice) << endl;
-
         string escolha;
         int numero_escolha;
 
@@ -220,20 +218,6 @@ int main()
                 {
                     // Se encontrou, mostra os registros na tela.
                     vector<int> respostas = gerenciador_registros.lista_de_ids_para_lista_de_posicoes(ids);
-
-                    cout << "Ponei\n";
-                    for (int i = 0; i < (int) ids.size(); i++)
-                    {
-                        cout << ids[i] << " ";
-                    }
-                    cout << endl;
-
-                    cout << "Ponei2\n";
-                    for (int i = 0; i < (int) respostas.size(); i++)
-                    {
-                        cout << respostas[i] << " ";
-                    }
-                    cout << endl;
 
                     cout << "RESULTADO: " << respostas.size() << " resultado(s) encontrado(s)." << endl;
 

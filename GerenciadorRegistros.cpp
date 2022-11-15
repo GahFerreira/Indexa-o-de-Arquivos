@@ -33,13 +33,7 @@ void GerenciadorRegistros::fechar_fstreams()
 */
 TituloNetflix GerenciadorRegistros::localizar_registro_arquivo_dados(int bytes_do_inicio)
 {
-    cout << "Ponei1\n";
-    Manipulador::checar_integridade_leitura((ifstream&) arquivo_dados);
-    cout << "Ponei2 & bytes_do_inicio: " << bytes_do_inicio << "\n";
     arquivo_dados.seekg(bytes_do_inicio, ios_base::beg);
-    cout << "Ponei3\n";
-    Manipulador::checar_integridade_leitura((ifstream&) arquivo_dados);
-    cout << "Ponei4\n";
 
     string registro = Manipulador::ler_registro((ifstream&) arquivo_dados);
 
@@ -188,7 +182,6 @@ vector<int> GerenciadorRegistros::lista_de_ids_para_lista_de_posicoes(vector<str
 {
     arquivo_indice.seekg(0, ios_base::beg);
     int quantidade_registros_indice = Manipulador::ler_inteiro((ifstream&) arquivo_indice);
-    cout << "qtd_registro_indice = " << quantidade_registros_indice << endl;
 
     // Guardará todo o conteúdo do arquivo em memória
     RegistroIndice registros_indice[quantidade_registros_indice];
@@ -196,17 +189,11 @@ vector<int> GerenciadorRegistros::lista_de_ids_para_lista_de_posicoes(vector<str
     // Leitura de todo o conteúdo do arquivo de índices direto de uma só vez.
     Manipulador::ler_dados((ifstream&) arquivo_indice, quantidade_registros_indice * sizeof(RegistroIndice), &registros_indice[0]);
 
-    cout << "qtd_registro_indice = " << quantidade_registros_indice << endl;
-
     vector<int> respostas;
 
     for (int i = 0; i < (int) ids.size(); i++)
     {
-        cout << "Ponei i[" << i << "]: " << ids[i] << " e resposta: ";
-
         respostas.push_back( busca_binaria_id_para_bytes_do_inicio(registros_indice, quantidade_registros_indice, ids[i]) );
-
-        cout << respostas[i] << endl;
     }
 
     return respostas;
@@ -220,8 +207,6 @@ void GerenciadorRegistros::ordenar_arquivo_indice()
 
     int quantidade_registros_arquivo_indice = Manipulador::ler_inteiro((ifstream&) arquivo_indice);
 
-    cout << "PoneiOrdenacao - qtd_reg_ind: " << quantidade_registros_arquivo_indice << endl;
-
     RegistroIndice registros_indice[quantidade_registros_arquivo_indice];
 
     Manipulador::ler_dados((ifstream&) arquivo_indice, sizeof(RegistroIndice) * quantidade_registros_arquivo_indice, &registros_indice[0]);
@@ -233,9 +218,6 @@ void GerenciadorRegistros::ordenar_arquivo_indice()
             // O registro excluído sempre vai pro final
             if (rI_1.id[0] == '*') return false;
             if (rI_2.id[0] == '*') return true;
-
-            if (TituloNetflix::id_para_inteiro(rI_1.id) == -1) cout << "id1: " << rI_1.id << endl;
-            if (TituloNetflix::id_para_inteiro(rI_2.id) == -1) cout << "id2: " << rI_2.id << endl;
 
             return TituloNetflix::id_para_inteiro(rI_1.id) < TituloNetflix::id_para_inteiro(rI_2.id);
         }
@@ -347,8 +329,6 @@ void GerenciadorRegistros::inserir_registro_final(TituloNetflix tN)
 
     string registro = tN.to_string(campos);
 
-    cout << "registro_como_string = " << registro << endl;
-
     int tamanho_registro = (int) registro.size();
 
     Manipulador::escrever_inteiro((ofstream&) arquivo_dados, tamanho_registro);
@@ -365,8 +345,6 @@ void GerenciadorRegistros::inserir_registro_final(TituloNetflix tN)
     arquivo_indice.seekg(0, ios_base::beg);
     int qtd_registros_indice = Manipulador::ler_inteiro((ifstream&) arquivo_indice);
 
-    cout << "InsercaoPonei - Qtd_Registros_ind: " << qtd_registros_indice << endl;
-
     RegistroIndice registro_indice;
     strcpy(registro_indice.id, tN.id);
     registro_indice.bytes_do_inicio = posicao_arquivo_dados;
@@ -378,8 +356,6 @@ void GerenciadorRegistros::inserir_registro_final(TituloNetflix tN)
     // Atualiza o cabeçalho
     arquivo_indice.seekp(0, ios_base::beg);
     Manipulador::escrever_inteiro((ofstream&) arquivo_indice, qtd_registros_indice+1);
-
-    cout << "InsercaoPonei - Qtd_Registros_ind+1: " << qtd_registros_indice+1 << endl;
 
     // Reordenação
     ordenar_arquivo_indice();
@@ -425,8 +401,6 @@ void GerenciadorRegistros::inserir_registro_inteligente(TituloNetflix tN)
     arquivo_reinsercao_dados.seekg(0, ios_base::beg);
     if (Manipulador::ler_inteiro((ifstream&) arquivo_reinsercao_dados) <= 0)
     {
-        cout << "PoneiCaso 1\n";
-
         inserir_registro_final(tN);
 
         return;
@@ -440,8 +414,6 @@ void GerenciadorRegistros::inserir_registro_inteligente(TituloNetflix tN)
     // Se não couber, insere no final.
     if ((int) registro.size() + (int) sizeof(int) > registro_reinsercao_dados.quantidade_bytes)
     {
-        cout << "PoneiCaso 2\n";
-
         inserir_registro_final(tN);
 
         return;
