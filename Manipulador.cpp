@@ -85,41 +85,45 @@ string Manipulador::ler_registro(ifstream& arquivo)
 {
 	// Inicializado para detecção de possíveis erros.
 	int tamanho = -1;
+	string resultado;
 
 	tamanho = ler_inteiro(arquivo);
 
 	if (tamanho <= 0)
 	{
 		cout << "Aviso: Tentativa de leitura de registro de tamanho 0 ou invalido." << endl;
-		return "";
+		resultado = "";
 	}
 
-	char *registro = new char[tamanho+1];
+	else
+	{
+		char *registro = new char[tamanho+1];
 
-	try
-	{
-		arquivo.read((char *) registro, tamanho);
-	}
-	catch(const std::exception& e)
-	{
-		cerr << "Falha na leitura de registro com tamanho " << tamanho << "." << endl;
+		try
+		{
+			arquivo.read((char *) registro, tamanho);
+
+			registro[tamanho] = '\0';
+
+			resultado = string(registro);
+		}
+
+		catch(const std::exception& e)
+		{
+			cerr << "Falha na leitura de registro com tamanho " << tamanho << "." << endl;
+
+			resultado = "";
+		}
+
 		delete[] registro;
-
-		return "";
 	}
-
-	registro[tamanho] = '\0';
-
-	string registro_retorno = string(registro);
-
-    delete[] registro;
 
 	if (checar_integridade_leitura(arquivo) == false)
 	{
 		cout << "[ERRO] Operacao: Leitura de Registro.\n";
 	}
 	
-	return registro_retorno;
+	return resultado;
 }
 
 /**
@@ -131,16 +135,18 @@ void Manipulador::ler_dados(ifstream& arquivo, int tamanho, void *destino)
 	if (tamanho <= 0)
 	{
 		cout << "Aviso: Tentativa de leitura de dados de tamanho 0 ou invalido." << endl;
-		return;
 	}
 
-	try
+	else
 	{
-		arquivo.read((char *) destino, tamanho);
-	}
-	catch(const std::exception& e)
-	{
-		cerr << "Falha na tentativa de leitura de dados de tamanho " << tamanho << "." << endl;
+		try
+		{
+			arquivo.read((char *) destino, tamanho);
+		}
+		catch(const std::exception& e)
+		{
+			cerr << "Falha na tentativa de leitura de dados de tamanho " << tamanho << "." << endl;
+		}
 	}
 
 	if (checar_integridade_leitura(arquivo) == false)
@@ -154,14 +160,16 @@ void Manipulador::ler_dados(ifstream& arquivo, int tamanho, void *destino)
 */
 bool Manipulador::escrever_inteiro(ofstream& arquivo, int inteiro)
 {
+	bool resultado = true;
+
 	try
 	{
-		arquivo.write((char *) &inteiro, sizeof(int));
+		arquivo.write(reinterpret_cast<const char *>(&inteiro), sizeof(inteiro));
 	}
 	catch(const std::exception& e)
 	{
 		cerr << "Erro: Falha na escrita do inteiro: " << inteiro << endl;
-		return false;
+		resultado = false;
 	}
 
 	if (checar_integridade_escrita(arquivo) == false)
@@ -169,7 +177,7 @@ bool Manipulador::escrever_inteiro(ofstream& arquivo, int inteiro)
 		cout << "[ERRO] Operacao: Escrita de Inteiro.\n";
 	}
 
-    return true;
+    return resultado;
 }
 
 /**
@@ -177,20 +185,25 @@ bool Manipulador::escrever_inteiro(ofstream& arquivo, int inteiro)
 */
 bool Manipulador::escrever_string(ofstream& arquivo, string str)
 {
+	bool resultado = true;
+
 	if (str.empty())
 	{
 		cout << "Aviso: Escrita de string de tamanho 0 ou invalido." << endl;
-		return false;
+		resultado = false;
 	}
 
-	try
+	else
 	{
-		arquivo.write((char *) str.c_str(), (int) str.size());
-	}
-	catch(const std::exception& e)
-	{
-		cerr << "Erro: Falha na escrita da string: " + str << endl;
-		return false;
+		try
+		{
+			arquivo.write((char *) str.c_str(), (int) str.size());
+		}
+		catch(const std::exception& e)
+		{
+			cerr << "Erro: Falha na escrita da string: " + str << endl;
+			resultado = false;
+		}
 	}
 
 	if (checar_integridade_escrita(arquivo) == false)
@@ -198,7 +211,7 @@ bool Manipulador::escrever_string(ofstream& arquivo, string str)
 		cout << "[ERRO] Operacao: Escrita de String.\n";
 	}
 
-	return true;
+	return resultado;
 }
 
 /**
@@ -207,25 +220,30 @@ bool Manipulador::escrever_string(ofstream& arquivo, string str)
 */
 bool Manipulador::escrever_string(ofstream& arquivo, string str, int tamanho)
 {
+	bool resultado = true;
+
 	if (tamanho <= 0)
 	{
 		cout << "Aviso: Escrita de string de tamanho 0 ou invalido." << endl;
-		return false;
+		resultado = false;
 	}
 
-	if (tamanho < (int) str.size())
+	else if (tamanho < (int) str.size())
 	{
 		cout << "Aviso: Escrita de string de tamanho definido menor que o tamanho real da string." << endl;
 	}
 
-	try
+	else
 	{
-		arquivo.write((char *) str.c_str(), tamanho);
-	}
-	catch(const std::exception& e)
-	{
-		cout << "Erro: Falha na escrita da string: " + str << endl;
-		return false;
+		try
+		{
+			arquivo.write((char *) str.c_str(), tamanho);
+		}
+		catch(const std::exception& e)
+		{
+			cout << "Erro: Falha na escrita da string: " + str << endl;
+			resultado = false;
+		}
 	}
 
 	if (checar_integridade_escrita(arquivo) == false)
@@ -233,7 +251,7 @@ bool Manipulador::escrever_string(ofstream& arquivo, string str, int tamanho)
 		cout << "[ERRO] Operacao: Escrita de String.\n";
 	}
 
-	return true;
+	return resultado;
 }
 
 /**
@@ -242,20 +260,25 @@ bool Manipulador::escrever_string(ofstream& arquivo, string str, int tamanho)
 */
 bool Manipulador::escrever_dados(ofstream& arquivo, void *dados, int tamanho)
 {
+	bool resultado = true;
+
     if (tamanho <= 0)
 	{
 		cout << "Erro: Escrita de dados de tamanho 0 ou invalido." << endl;
-		return false;
+		resultado = false;
 	}
 
-	try
+	else
 	{
-		arquivo.write((char *) dados, tamanho);
-	}
-	catch(const std::exception& e)
-	{
-		cout << "Erro: Falha na escrita de dados de tamanho " << tamanho << "." << endl;
-		return false;
+		try
+		{
+			arquivo.write((char *) dados, tamanho);
+		}
+		catch(const std::exception& e)
+		{
+			cout << "Erro: Falha na escrita de dados de tamanho " << tamanho << "." << endl;
+			resultado = false;
+		}
 	}
 
 	if (checar_integridade_escrita(arquivo) == false)
@@ -263,5 +286,5 @@ bool Manipulador::escrever_dados(ofstream& arquivo, void *dados, int tamanho)
 		cout << "[ERRO] Operacao: Escrita de Dados.\n";
 	}
 
-	return true;
+	return resultado;
 }

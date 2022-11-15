@@ -154,7 +154,7 @@ bool GeradorArquivos::criar_arquivo_indice_primario(const char *nome_arq_dados, 
 	}
 
     // Lê-se a quantidade de registros do arquivo de dados
-    quantidade_registros = Manipulador::ler_inteiro(arquivo_dados);
+    quantidade_registros = Manipulador::ler_inteiro(arquivo_dados); cout << "PoneiCriacao - qtd_reg_ind: " << quantidade_registros << endl;
     byte_atual += sizeof(int);
 
     // Escreve-se a quantidade de registros no arquivo de índices
