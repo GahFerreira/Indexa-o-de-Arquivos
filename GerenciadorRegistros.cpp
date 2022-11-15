@@ -1,7 +1,7 @@
 #include "GerenciadorRegistros.h"
 
 // `campos` define quais campos de TituloNetflix são utilizados para operações desse objeto.
-GerenciadorRegistros::GerenciadorRegistros(string nome_arquivo_dados, string nome_arquivo_indice, string nome_arquivo_titulo, string nome_arquivo_reinsercao_dados, int quantidade_registros, vector<bool> campos)
+GerenciadorRegistros::GerenciadorRegistros(string nome_arquivo_dados, string nome_arquivo_indice, string nome_arquivo_titulo, string nome_arquivo_reinsercao_dados, vector<bool> campos)
 {
     this->nome_arquivo_dados = nome_arquivo_dados;
     this->nome_arquivo_indice = nome_arquivo_indice;
@@ -478,18 +478,21 @@ void GerenciadorRegistros::inserir_registro_inteligente(TituloNetflix tN)
 
 
     // Atualização arquivo reinserção de dados
-    registro_reinsercao_dados.bytes_do_inicio +=  (int) sizeof(int) + (int) registro.size();
+    registro_reinsercao_dados.bytes_do_inicio += (int) sizeof(int) + (int) registro.size();
     registro_reinsercao_dados.quantidade_bytes -= (int) sizeof(int) + (int) registro.size();
 
     arquivo_reinsercao_dados.seekp(sizeof(int), ios_base::beg);
     Manipulador::escrever_dados((ofstream&) arquivo_reinsercao_dados, (void *) &registro_reinsercao_dados, sizeof(RegistroReinsercaoDados));
+
+    ordenar_arquivo_reinsercao();
 }
 
 bool GerenciadorRegistros::deletar_registro(string id_registro)
 {
+    // Checagem de validade do id
     if (id_eh_valido(id_registro) == false) return false;
 
-    // Checagem adicional para ver se deleta mesmo.
+    // Checagem de existência do id
     arquivo_indice.seekg(0, ios_base::beg);
 
     int quantidade_registros_indice = Manipulador::ler_inteiro((ifstream&) arquivo_indice);
@@ -502,12 +505,12 @@ bool GerenciadorRegistros::deletar_registro(string id_registro)
 
     tie(pos_registro_arquivo_dados, pos_registro_arquivo_indices) = busca_binaria_para_posicoes_nos_arquivos(registros_indice, quantidade_registros_indice, id_registro);
 
-    // Caso não encontre o registro para deleção.
     if (pos_registro_arquivo_dados < 0) return false;
 
-    // Caso encontre (Daqui pra baixo)
+    // Caso o id seja válido e exista: deleção confirmada.
     char asterisco = '*';
 
+    // Atualização arquivo índice
     arquivo_indice.seekp(pos_registro_arquivo_indices, ios_base::beg);
 
     Manipulador::escrever_dados((ofstream&) arquivo_indice, (void *) &asterisco, sizeof(char));

@@ -103,10 +103,11 @@ int main()
 
     // GERAÇÃO ESTATISTICA
     {
-        ifstream arquivo_dados;
+        ifstream arquivo_dados, arquivo_indice;
         arquivo_dados.open(ARQUIVO_DADOS, ios_base::in | ios_base::binary);
+        arquivo_indice.open(ARQUIVO_INDICE, ios_base::in | ios_base::binary);
 
-        estatistica.gerar_estatisticas(arquivo_dados, campos);
+        estatistica.gerar_estatisticas(arquivo_dados, arquivo_indice, campos);
 
         cout << "Estatisticas iniciais geradas.\n\n";
 
@@ -115,7 +116,7 @@ int main()
 
     // INTERAÇÃO COM O USUÁRIO
     {
-        GerenciadorRegistros gerenciador_registros(ARQUIVO_DADOS, ARQUIVO_INDICE, ARQUIVO_TITULO, ARQUIVO_REINSERCAO_DADOS, estatistica.quantidade_registros, campos);
+        GerenciadorRegistros gerenciador_registros(ARQUIVO_DADOS, ARQUIVO_INDICE, ARQUIVO_TITULO, ARQUIVO_REINSERCAO_DADOS, campos);
 
         gerenciador_registros.abrir_fstreams();
 
@@ -680,7 +681,7 @@ int main()
             {
                 if (estatistica.precisa_atualizar == true)
                 {
-                    estatistica.gerar_estatisticas((ifstream&) gerenciador_registros.arquivo_dados, campos);
+                    estatistica.gerar_estatisticas((ifstream&) gerenciador_registros.arquivo_dados, (ifstream&) gerenciador_registros.arquivo_indice, campos);
 
                     estatistica.precisa_atualizar = false;
                 }

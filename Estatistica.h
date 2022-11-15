@@ -3,6 +3,7 @@
 
 #include "TituloNetflix.h"
 #include "Manipulador.h"
+#include "GeradorArquivos.h"
 
 #define INF 1 << 30 // INFINITO
 
@@ -21,8 +22,8 @@ class Estatistica
         // So precisa gerar as estatisticas de novo caso haja mudança nos registros.
         bool precisa_atualizar;
 
-        void gerar_estatisticas(ifstream& arquivo_dados);
-        void gerar_estatisticas(ifstream& arquivo_dados, vector<bool>& campos);
+        void gerar_estatisticas(ifstream& arquivo_dados, ifstream& arquivo_indice);
+        void gerar_estatisticas(ifstream& arquivo_dados, ifstream& arquivo_indice, vector<bool>& campos);
 };
 
 #endif
