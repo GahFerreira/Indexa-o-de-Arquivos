@@ -22,6 +22,7 @@ class Manipulador
         static bool escrever_string(ofstream& arquivo, string dados, int tamanho);
         static bool escrever_dados(ofstream& arquivo, void *dados, int tamanho);
 
+        // Checagem de erros
         static bool checar_integridade_leitura(ifstream& arquivo);
         static bool checar_integridade_escrita(ofstream& arquivo);
 };

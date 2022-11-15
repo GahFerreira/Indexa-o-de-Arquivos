@@ -23,6 +23,7 @@ void Estatistica::gerar_estatisticas(ifstream& arquivo_dados, vector<bool>& camp
 
     for (int i = 0; i < quantidade_registros; i++)
     {
+        // Lê registro por registro do arquivo
         string registro = Manipulador::ler_registro((ifstream&) arquivo_dados);
 
         if ((int) registro.size() < tamanho_menor)

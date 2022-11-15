@@ -71,8 +71,6 @@ int main()
 
             return -1;
         }
-    
-    
 
         // ARQUIVO ÍNDICE indireto (TÍTULOS -> ID)
 
