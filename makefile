@@ -23,4 +23,4 @@ TituloNetflix.o: TituloNetflix.cpp TituloNetflix.h
 	$(CXX) $(CXXFLAGS) TituloNetflix.cpp
 
 clean:
-	rm *.o ProjetoPratico.exe
+	rm *.o *.txt ProjetoPratico.exe
