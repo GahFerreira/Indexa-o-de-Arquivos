@@ -20,7 +20,6 @@ class GerenciadorRegistros
     public:
         string nome_arquivo_dados, nome_arquivo_indice, nome_arquivo_titulo, nome_arquivo_reinsercao_dados;
         fstream arquivo_dados, arquivo_indice, arquivo_titulo, arquivo_reinsercao_dados;
-        int quantidade_registros;
         vector<bool> campos;
 
         GerenciadorRegistros(string nome_arquivo_dados, string nome_arquivo_indice, string nome_arquivo_titulo, string nome_arquivo_reinsercao_dados, int quantidade_registros, vector<bool> campos);

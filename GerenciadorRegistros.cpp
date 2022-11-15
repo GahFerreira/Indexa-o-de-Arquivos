@@ -7,7 +7,6 @@ GerenciadorRegistros::GerenciadorRegistros(string nome_arquivo_dados, string nom
     this->nome_arquivo_indice = nome_arquivo_indice;
     this->nome_arquivo_titulo = nome_arquivo_titulo;
     this->nome_arquivo_reinsercao_dados = nome_arquivo_reinsercao_dados;
-    this->quantidade_registros = quantidade_registros;
     this->campos = campos;
 }
 
@@ -390,8 +389,6 @@ void GerenciadorRegistros::inserir_registro_final(TituloNetflix tN)
 */
 void GerenciadorRegistros::inserir_registro_inteligente(TituloNetflix tN)
 {
-    quantidade_registros++;
-
     string registro = tN.to_string(campos);
 
     // Checa para ver se há lugares vagos no arquivo.
@@ -492,13 +489,12 @@ bool GerenciadorRegistros::deletar_registro(string id_registro)
 {
     if (id_eh_valido(id_registro) == false) return false;
 
-    quantidade_registros--;
-    char asterisco = '*';
-
-    // Atualização arquivo índice
+    // Checagem adicional para ver se deleta mesmo.
     arquivo_indice.seekg(0, ios_base::beg);
 
     int quantidade_registros_indice = Manipulador::ler_inteiro((ifstream&) arquivo_indice);
+
+    cout << "qtd_registros_ind: " << quantidade_registros_indice << endl;
 
     RegistroIndice registros_indice[quantidade_registros_indice];
 
@@ -508,18 +504,17 @@ bool GerenciadorRegistros::deletar_registro(string id_registro)
 
     tie(pos_registro_arquivo_dados, pos_registro_arquivo_indices) = busca_binaria_para_posicoes_nos_arquivos(registros_indice, quantidade_registros_indice, id_registro);
 
-    // Caso não encontre o registro para deleção
+    // Caso não encontre o registro para deleção.
     if (pos_registro_arquivo_dados < 0) return false;
 
     // Caso encontre (Daqui pra baixo)
+    char asterisco = '*';
+
     arquivo_indice.seekp(pos_registro_arquivo_indices, ios_base::beg);
 
     Manipulador::escrever_dados((ofstream&) arquivo_indice, (void *) &asterisco, sizeof(char));
 
-    // Cabeçalho
-    arquivo_indice.seekp(0, ios_base::beg);
-    Manipulador::escrever_inteiro((ofstream&) arquivo_indice, quantidade_registros);
-
+    // O cabeçalho é atualizado diretamente na ordenação
     // Reordenação
     ordenar_arquivo_indice();
 
@@ -531,8 +526,11 @@ bool GerenciadorRegistros::deletar_registro(string id_registro)
     Manipulador::escrever_dados((ofstream&) arquivo_dados, (void *) &asterisco, sizeof(char));
 
     // Cabeçalho
+    arquivo_dados.seekg(0, ios_base::beg);
+    int quantidade_registros_dados = Manipulador::ler_inteiro((ifstream&) arquivo_dados);
+
     arquivo_dados.seekp(0, ios_base::beg);
-    Manipulador::escrever_inteiro((ofstream&) arquivo_dados, quantidade_registros);
+    Manipulador::escrever_inteiro((ofstream&) arquivo_dados, quantidade_registros_dados-1);
 
 
     // Atualização arquivo titulo
@@ -556,6 +554,8 @@ bool GerenciadorRegistros::deletar_registro(string id_registro)
             break;
         }
     }
+
+    // Não atualiza o cabeçalho, pois não realmente deleta registros.
 
 
     // Atualização arquivo reinserção de registros de dados
