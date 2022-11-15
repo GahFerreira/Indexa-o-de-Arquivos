@@ -494,8 +494,6 @@ bool GerenciadorRegistros::deletar_registro(string id_registro)
 
     int quantidade_registros_indice = Manipulador::ler_inteiro((ifstream&) arquivo_indice);
 
-    cout << "qtd_registros_ind: " << quantidade_registros_indice << endl;
-
     RegistroIndice registros_indice[quantidade_registros_indice];
 
     Manipulador::ler_dados((ifstream&) arquivo_indice, sizeof(RegistroIndice) * quantidade_registros_indice, &registros_indice[0]);
