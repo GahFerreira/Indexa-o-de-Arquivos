@@ -317,8 +317,6 @@ void GerenciadorRegistros::ordenar_arquivo_reinsercao()
 */
 void GerenciadorRegistros::inserir_registro_final(TituloNetflix tN)
 {
-    // quantidade_registros++; // Essa função é chamada como caso alternativo da inserção inteligente
-
     // Inserção final do arquivo de dados
     arquivo_dados.seekg(0, ios_base::beg);
     int quantidade_registros_dados = Manipulador::ler_inteiro((ifstream&) arquivo_dados);
